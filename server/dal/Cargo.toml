@@ -1,0 +1,19 @@
+[package]
+name = "dal"
+version = "0.1.0"
+edition = "2021"
+authors = ["Tobias de Bruijn <t.debruijn@array21.dev>"]
+
+[dependencies]
+thiserror = "1.0.30"
+time = "0.3.7"
+rand = "0.8.5"
+
+[dependencies.mysql]
+version = "=22.0.0"
+default-features = false
+
+[dependencies.refinery]
+version = "0.8.4"
+default-features = false
+features = ["mysql"]

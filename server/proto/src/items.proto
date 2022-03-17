@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package bierzee.items;
+
+message LoginRequest {
+  string employeeId = 1;
+  string name = 2;
+}
+
+message LoginResponse {
+  string sessionId = 1;
+}
+
+message DrinkRequest {
+  int32 beersDrunk = 2;
+}
+
+message DrunkResponse {
+  repeated Beer beers = 1;
+}
+
+message Beer {
+  int64 drunk_at = 1;
+}
+
+message PayRequest {
+  double amount = 1;
+}
+
+message BrokeResponse {
+  repeated Payment payments = 1;
+}
+
+message Payment {
+  int64 paidAt = 1;
+  double amountPaid = 2;
+}
+
+message GetBeerPriceResponse {
+  int64 lastUpdated = 1;
+  double price = 2;
+}
+
+message SetBeerPriceRequest {
+  double price = 1;
+}
+
+message BalanceResponse {
+  double amountPaid = 1;
+  int64 beersDrunk = 2;
+  double balance = 3;
+}
+
+message OwesResponse {
+  repeated OwningUser owningUsers = 1;
+}
+
+message OwningUser {
+  string employeeId = 1;
+  string name = 2;
+  double amountOwed = 3;
+}
+
+message SetAdminRequest {
+  string employeeId = 1;
+  bool admin = 2;
+}
