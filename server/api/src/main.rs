@@ -22,7 +22,7 @@ async fn main() -> std::io::Result<()> {
 
     info!("Creating appdata");
     let appdata = AppData::new(config).expect("Creating appdata");
-    let webdata = Arc::new(appdata);
+    let webdata = actix_web::web::Data::new(Arc::new(appdata));
 
     let server = HttpServer::new(move || {
         App::new()
@@ -32,7 +32,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Governor::new(&GovernorConfig::default()))
             .service(
                 web::scope("/api/v1")
-                    .route("/login", web::get().to(services::login::login))
+                    .route("/login", web::post().to(services::login::login))
                     .route("/beer/drink", web::post().to(services::beer::drink::drink))
                     .route("/beer/drunk", web::get().to(services::beer::drunk::drunk))
                     .route("/beer/price", web::get().to(services::beer::price::price))

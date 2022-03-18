@@ -49,6 +49,7 @@ message BalanceResponse {
   double amountPaid = 1;
   int64 beersDrunk = 2;
   double balance = 3;
+  int64 beersLeft = 4;
 }
 
 message OwesResponse {

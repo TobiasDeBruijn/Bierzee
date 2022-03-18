@@ -20,10 +20,12 @@ pub async fn balance(data: WebData, session: Session) -> WebResult<Payload<Balan
     // Round to 2 digits
     let balance = (balance * 100.0).round() / 100.0;
     let amount_paid = (amount_paid * 100.0).round() / 100.0;
+    let beers_left = (balance / beer_price).floor() as i64;
 
     Ok(Payload(BalanceResponse {
         amount_paid,
         beers_drunk,
         balance,
+        beers_left
     }))
 }

@@ -59,7 +59,7 @@ impl User {
     pub fn get_beers(&self) -> DalResult<Vec<Beer>> {
         let mut conn = self.pool.get_conn()?;
         let rows: Vec<Row> = conn.exec(
-            "SELECT consument_at FROM beers WHERE user_id = :user_id",
+            "SELECT consumed_at FROM beers WHERE user_id = :user_id",
             params! {
                 "user_id" => &self.employee_number
             },
