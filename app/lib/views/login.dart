@@ -1,4 +1,5 @@
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/home.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
@@ -68,15 +69,12 @@ class _LoginFormState extends State<LoginForm> {
                   return;
                 }
 
-                User? user = await User.doLogin(widget._employeeIdController.text, widget._userNameController.text);
-                if(user == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw'),
-                  ));
+                Response<User> user = await User.doLogin(widget._employeeIdController.text, widget._userNameController.text);
+                if(!user.handleNotOk(context)) {
                   return;
                 }
 
-                navigateToHome(user);
+                navigateToHome(user.value!);
               },
             )
           )

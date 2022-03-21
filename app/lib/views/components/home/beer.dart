@@ -1,4 +1,6 @@
+import 'package:bierzee/entities/beer.dart';
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -22,32 +24,32 @@ class _BeerComponentState extends State<BeerComponent> {
   bool isLoading = true;
   bool consumeBeerLoading = false;
 
+  int lastConsumedBeerAt = 0;
+
   @override
   void initState() {
     super.initState();
+    getValues();
+  }
 
-    widget.user.getBeers().then((beers) {
-      debugPrint('Beers fetched');
-      if(beers == null) {
-        Future<Null>.delayed(Duration.zero, () {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw')));
-        });
+  void getValues() async {
+    Response<List<Beer>> beers = await widget.user.getBeers();
 
-        return;
-      }
+    if(!beers.handleNotOk(context)) {
+      return;
+    }
 
-      beersConsumedTotal = beers.length;
+    beersConsumedTotal = beers.value!.length;
 
-      DateTime dateTime = DateTime.now();
-      int startOfTodayEpoch = (DateTime.utc(dateTime.year, dateTime.month, dateTime.day).millisecondsSinceEpoch / 1000.0).floor();
+    DateTime dateTime = DateTime.now();
+    int startOfTodayEpoch = (DateTime.utc(dateTime.year, dateTime.month, dateTime.day).millisecondsSinceEpoch / 1000.0).floor();
 
-      beersConsumedToday = beers
-          .where((element) => element.consumedAt > startOfTodayEpoch)
-          .length;
+    beersConsumedToday = beers.value!
+        .where((element) => element.consumedAt > startOfTodayEpoch)
+        .length;
 
-      setState(() {
-        isLoading = false;
-      });
+    setState(() {
+      isLoading = false;
     });
   }
 
@@ -120,25 +122,28 @@ class _BeerComponentState extends State<BeerComponent> {
   }
 
   void consumeBeer() async {
-    setState(() {
-      consumeBeerLoading = true;
-    });
-
-    bool success = await widget.user.consumeBeers(1);
-    if(!success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw')));
-      setState(() {
-        consumeBeerLoading = false;
+    if(DateTime.now().millisecondsSinceEpoch - lastConsumedBeerAt < 2000) {
+      Future<Null>.delayed(Duration.zero, () {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text("Rustig aan.")));
       });
       return;
     }
 
     setState(() {
-      beersConsumedTotal += 1;
-      beersConsumedToday += 1;
+      lastConsumedBeerAt = DateTime.now().millisecondsSinceEpoch;
+      consumeBeerLoading = true;
+    });
+
+    Response<void> success = await widget.user.consumeBeers(1);
+    if(!success.handleNotOk(context)) {
+      return;
+    }
+
+    setState(() {
       consumeBeerLoading = false;
     });
 
+    getValues();
     widget.balanceComponentKey.currentState!.getValues();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/home.dart';
 import 'package:bierzee/views/login.dart';
 import 'package:flutter/material.dart';
@@ -63,8 +64,12 @@ class _SplashScreenState extends State<SplashScreen> {
       return null;
     }
 
-    User? user = await User.doLogin(userId, userName);
-    return user;
+    Response<User> user = await User.doLogin(userId, userName);
+    if(!user.handleNotOk(context)) {
+      return null;
+    } else {
+      return user.value!;
+    }
   }
 
   void navigateToHome(User user) {

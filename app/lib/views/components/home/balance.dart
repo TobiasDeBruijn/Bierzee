@@ -1,5 +1,6 @@
 import 'package:bierzee/entities/payment.dart';
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/util/http.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -17,6 +18,8 @@ class BalanceComponentState extends State<BalanceComponent> {
   double balance = 0;
   int beersLeft = 0;
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -24,17 +27,15 @@ class BalanceComponentState extends State<BalanceComponent> {
   }
 
   void getValues() async {
-    PaymentBalance? balance = await widget.user.getPaymentBalance();
-    if(balance == null) {
-      Future<Null>.delayed(Duration.zero, () {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw')));
-      });
+    Response<PaymentBalance> balance = await widget.user.getPaymentBalance();
+    if(!balance.handleNotOk(context)) {
       return;
     }
 
     setState(() {
-      this.balance = balance.balance;
-      this.beersLeft = balance.beersLeft;
+      this.balance = balance.value!.balance;
+      this.beersLeft = balance.value!.beersLeft;
+      this.isLoading = false;
     });
   }
 

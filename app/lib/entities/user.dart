@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:bierzee/entities/beer.dart';
 import 'package:bierzee/entities/payment.dart';
+import 'package:bierzee/main.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,10 +14,11 @@ class User {
   final String name;
   final String sessionId;
 
-  static http.Client _CLIENT = http.Client();
-  static const String _SERVER = "http://10.10.2.1:8080";
+  final bool isAdmin;
 
-  const User._({required this.id, required this.name, required this.sessionId});
+  static http.Client _CLIENT = http.Client();
+
+  const User._({required this.id, required this.name, required this.sessionId, required this.isAdmin});
 
   void _setPreferences() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
@@ -24,13 +26,19 @@ class User {
     sharedPreferences.setString("userName", name);
   }
 
-  static Future<User?> doLogin(String id, String name) async {
+  void _clearPreferences() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    sharedPreferences.remove("userId");
+    sharedPreferences.remove("userName");
+  }
+
+  static Future<Response<User>> doLogin(String id, String name) async {
     debugPrint('Logging in');
     try {
       proto.LoginRequest loginRequest = proto.LoginRequest(
           employeeId: id, name: name);
       http.Response response = await _CLIENT.post(
-          Uri.parse("$_SERVER/api/v1/login"),
+          Uri.parse("$SERVER/api/v1/login"),
           headers: getProtobufHeaders(),
           body: loginRequest.writeToBuffer()
       );
@@ -39,25 +47,46 @@ class User {
         case 200:
           proto.LoginResponse loginResponse = proto.LoginResponse.fromBuffer(
               response.bodyBytes);
-          User user = User._(id: id, name: name, sessionId: loginResponse.sessionId);
+          User user = User._(id: id, name: name, sessionId: loginResponse.sessionId, isAdmin: loginResponse.isAdmin);
           user._setPreferences();
-          return user;
+          return Response.ok(user);
+        case 429:
+          return Response.rateLimit();
         default:
           debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
-          return null;
+          return Response.fail();
       }
-
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return null;
+      return Response.fail();
     }
   }
 
-  Future<List<Beer>?> getBeers() async {
+  Future<Response<void>> doLogout() async {
+    debugPrint('Logging out');
+    try {
+      http.Response response = await _CLIENT.post(Uri.parse("$SERVER/api/v1/logout"), headers: getHeaders(sessionId));
+      switch(response.statusCode) {
+        case 200:
+          _clearPreferences();
+          return Response.ok(null);
+        case 429:
+          return Response.rateLimit();
+        default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
+          return Response.fail();
+      }
+    } on SocketException catch(e) {
+      debugPrint('SocketException ' + e.toString());
+      return Response.fail();
+    }
+  }
+
+  Future<Response<List<Beer>>> getBeers() async {
     debugPrint('Fetching beers');
     try {
       http.Response response = await _CLIENT.get(
-          Uri.parse("$_SERVER/api/v1/beer/drunk"),
+          Uri.parse("$SERVER/api/v1/beer/drunk"),
           headers: getHeaders(sessionId)
       );
 
@@ -65,22 +94,22 @@ class User {
         case 200:
           proto.DrunkResponse drunkResponse = proto.DrunkResponse.fromBuffer(
               response.bodyBytes);
-          return drunkResponse.beers.map((e) => Beer(e.drunkAt.toInt()))
-              .toList();
+          return Response.ok(drunkResponse.beers.map((e) => Beer(e.drunkAt.toInt()))
+              .toList());
         default:
-          return null;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return null;
+      return Response.fail();
     }
   }
 
-  Future<int?> getBeerPrice() async {
+  Future<Response<BeerPrice>> getBeerPrice() async {
     debugPrint('Fetching beer price');
     try {
       http.Response response = await _CLIENT.get(
-          Uri.parse("$_SERVER/api/v1/beer/price"),
+          Uri.parse("$SERVER/api/v1/beer/price"),
           headers: getHeaders(sessionId)
       );
 
@@ -88,44 +117,48 @@ class User {
         case 200:
           proto.GetBeerPriceResponse getBeerPriceResponse = proto
               .GetBeerPriceResponse.fromBuffer(response.bodyBytes);
-          return getBeerPriceResponse.price.toInt();
+          return Response.ok(BeerPrice(price: getBeerPriceResponse.price, lastUpdated: getBeerPriceResponse.lastUpdated.toInt(), lastChangedBy: getBeerPriceResponse.lastChangedByName));
+        case 429:
+          return Response.rateLimit();
         default:
-          return null;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return null;
+      return Response.fail();
     }
   }
 
-  Future<bool> consumeBeers(int amountConsumed) async {
+  Future<Response<void>> consumeBeers(int amountConsumed) async {
     debugPrint('Consuming beers');
     try {
       proto.DrinkRequest drinkRequest = proto.DrinkRequest(
           beersDrunk: amountConsumed);
       http.Response response = await _CLIENT.post(
-          Uri.parse("$_SERVER/api/v1/beer/drink"),
+          Uri.parse("$SERVER/api/v1/beer/drink"),
           headers: getHeaders(sessionId),
           body: drinkRequest.writeToBuffer()
       );
 
       switch (response.statusCode) {
         case 200:
-          return true;
+          return Response.ok(null);
+        case 429:
+          return Response.rateLimit();
         default:
-          return false;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return false;
+      return Response.fail();
     }
   }
 
-  Future<List<Payment>?> getPayments() async {
+  Future<Response<List<Payment>>> getPayments() async {
     debugPrint('Fetching payments');
     try {
       http.Response response = await _CLIENT.get(
-          Uri.parse("$_SERVER/api/v1/payment/broke"),
+          Uri.parse("$SERVER/api/v1/payment/broke"),
           headers: getHeaders(sessionId)
       );
 
@@ -133,23 +166,25 @@ class User {
         case 200:
           proto.BrokeResponse brokeResponse = proto.BrokeResponse.fromBuffer(
               response.bodyBytes);
-          return brokeResponse.payments.map((e) =>
+          return Response.ok(brokeResponse.payments.map((e) =>
               Payment(amountPaid: e.amountPaid, paidAt: e.paidAt.toInt()))
-              .toList();
+              .toList());
+        case 429:
+          return Response.rateLimit();
         default:
-          return null;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return null;
+      return Response.fail();
     }
   }
 
-  Future<PaymentBalance?> getPaymentBalance() async {
+  Future<Response<PaymentBalance>> getPaymentBalance() async {
     debugPrint('Fetching payment balance');
     try {
       http.Response response = await _CLIENT.get(
-          Uri.parse("$_SERVER/api/v1/payment/balance"),
+          Uri.parse("$SERVER/api/v1/payment/balance"),
           headers: getHeaders(sessionId)
       );
 
@@ -157,39 +192,43 @@ class User {
         case 200:
           proto.BalanceResponse balanceResponse = proto.BalanceResponse
               .fromBuffer(response.bodyBytes);
-          return PaymentBalance(amountPaid: balanceResponse.amountPaid,
+          return Response.ok(PaymentBalance(amountPaid: balanceResponse.amountPaid,
               beersDrunk: balanceResponse.beersDrunk.toInt(),
               balance: balanceResponse.balance,
               beersLeft: balanceResponse.beersLeft.toInt(),
-          );
+          ));
+        case 429:
+          return Response.rateLimit();
         default:
-          return null;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return null;
+      return Response.fail();
     }
   }
 
-  Future<bool> makePayment(double amountPaid) async {
+  Future<Response<void>> makePayment(double amountPaid) async {
     debugPrint('Making payment');
     try {
       proto.PayRequest payRequest = proto.PayRequest(amount: amountPaid);
       http.Response response = await _CLIENT.post(
-          Uri.parse("$_SERVER/api/v1/payment/pay"),
+          Uri.parse("$SERVER/api/v1/payment/pay"),
           headers: getHeaders(sessionId),
           body: payRequest.writeToBuffer()
       );
 
       switch (response.statusCode) {
         case 200:
-          return true;
+          return Response.ok(null);
+        case 429:
+          return Response.rateLimit();
         default:
-          return false;
+          return Response.fail();
       }
     } on SocketException catch(e) {
       debugPrint('SocketException ' + e.toString());
-      return false;
+      return Response.fail();
     }
   }
 }

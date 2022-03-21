@@ -1,5 +1,5 @@
 name: bierzee
-description: A new Flutter project.
+description: Zandzee Bier App
 
 publish_to: 'none'
 version: 1.0.0+1
@@ -10,13 +10,25 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.2  
   shared_preferences: ^2.0.13
   google_fonts: ^2.3.1
   http: ^0.13.4
   protobuf: ^2.0.1
+  url_launcher: ^6.0.20
+  flutter_launcher_icons:
+    git:
+      url: https://github.com/Davenchy/flutter_launcher_icons.git
+      ref: fixMinSdkParseFlutter2.8
+  intl: ^0.17.0
 
 flutter:
   uses-material-design: true
   assets:
   - assets/
+
+flutter_icons:
+  android: launcher_icon
+  ios: true
+  image_path: 'assets/logo.png' 
+ 

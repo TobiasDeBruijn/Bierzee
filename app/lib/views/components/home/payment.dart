@@ -1,11 +1,11 @@
 import 'package:bierzee/entities/payment.dart';
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/services.dart';
 
 class PaymentComponent extends StatefulWidget {
   const PaymentComponent({Key? key, required this.user, required this.balanceComponentKey}) : super(key: key);
@@ -29,12 +29,8 @@ class _PaymentComponentState extends State<PaymentComponent> {
   }
 
   void getValues() async {
-    List<Payment>? payments = await widget.user.getPayments();
-    if(payments == null) {
-      debugPrint('Failed to get payments');
-      Future<Null>.delayed(Duration.zero, () {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw')));
-      });
+    Response<List<Payment>> payments = await widget.user.getPayments();
+    if(!payments.handleNotOk(context)) {
       return;
     }
 
@@ -42,8 +38,8 @@ class _PaymentComponentState extends State<PaymentComponent> {
     int startOfTodayEpoch = (DateTime.utc(dateTime.year, dateTime.month, dateTime.day).millisecondsSinceEpoch / 1000.0).floor();
 
     setState(() {
-      totalPaid = payments.map((e) => e.amountPaid).sum;
-      paidToday = payments
+      totalPaid = payments.value!.map((e) => e.amountPaid).sum;
+      paidToday = payments.value!
           .where((element) => element.paidAt > startOfTodayEpoch)
           .map((e) => e.amountPaid)
           .sum;
@@ -146,6 +142,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                 Form(
                   key: _formKey,
                   child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       TextFormField(
                         controller: _inputController,
@@ -187,24 +184,21 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       isPaymentLoading = true;
     });
 
-    double value = double.parse(_inputController.text.replaceAll('€', ""));
-    bool success = await widget.user.makePayment(value);
-    if(!success) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: const Text('Er is iets verkeerd gegaan. Probeer het later opnieuw')));
-      setState(() {
-        isPaymentLoading = false;
-      });
-      return;
-    }
-
-    widget.balanceComponentKey.currentState!.getValues();
+    double value = double.parse(_inputController.text
+        .replaceAll('€', "")
+        .replaceAll(',', '.'));
+    Response<void> success = await widget.user.makePayment(value);
 
     setState(() {
       isPaymentLoading = false;
     });
 
-    widget.getValuesFunction();
+    if(!success.handleNotOk(context)) {
+      return;
+    }
+
     widget.balanceComponentKey.currentState!.getValues();
+    widget.getValuesFunction();
     Navigator.pop(context);
   }
 }
