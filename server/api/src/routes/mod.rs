@@ -12,6 +12,8 @@ pub mod beer;
 pub mod login;
 pub mod payment;
 pub mod system;
+pub mod about;
+pub mod logout;
 
 fn get_header(req: &HttpRequest, header: &str) -> Option<String> {
     let value = req.headers().get(header)?;

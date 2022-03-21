@@ -3,6 +3,8 @@ name = "api"
 version = "0.1.0"
 edition = "2021"
 authors = ["Tobias de Bruijn <t.debruijn@array21.dev>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/TobiasDeBruijn/Bierzee"
 
 [dependencies]
 thiserror = "1.0.30"

@@ -18,6 +18,8 @@ pub enum Error {
     BadRequest(&'static str),
     #[error("Unauthorized: {0}")]
     Unauthorized(&'static str),
+    #[error("Internal server error")]
+    Internal,
 }
 
 impl ResponseError for Error {
@@ -28,6 +30,7 @@ impl ResponseError for Error {
             Self::Forbidden(_) => StatusCode::FORBIDDEN,
             Self::BadRequest(_) => StatusCode::BAD_REQUEST,
             Self::Unauthorized(_) => StatusCode::UNAUTHORIZED,
+            Self::Internal => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 

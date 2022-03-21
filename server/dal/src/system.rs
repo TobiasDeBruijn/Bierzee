@@ -112,7 +112,7 @@ impl System {
                 "name" => name,
                 "value" => value,
                 "last_updated" => time::OffsetDateTime::now_utc().unix_timestamp(),
-                "last_updated_by" => &user.name
+                "last_updated_by" => &user.employee_number
             },
         )?;
 

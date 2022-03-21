@@ -21,5 +21,5 @@ pub async fn login(data: WebData, payload: Payload<LoginRequest>) -> WebResult<P
     };
 
     let session = user.create_session()?;
-    Ok(Payload(LoginResponse { session_id: session.id }))
+    Ok(Payload(LoginResponse { session_id: session.id, is_admin: user.is_admin }))
 }
