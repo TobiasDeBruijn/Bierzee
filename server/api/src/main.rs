@@ -2,10 +2,11 @@ use crate::appdata::AppData;
 use crate::config::Config;
 use actix_cors::Cors;
 use actix_governor::{Governor, GovernorConfig};
-use actix_web::{web, App, HttpServer};
+use actix_web::{App, HttpServer, web};
 use std::sync::Arc;
 use tracing::{debug, info, trace};
 use tracing_actix_web::TracingLogger;
+use routes::auth;
 
 mod appdata;
 mod config;
@@ -32,8 +33,9 @@ async fn main() -> std::io::Result<()> {
             .wrap(Governor::new(&GovernorConfig::default()))
             .service(
                 web::scope("/api/v1")
-                    .route("/login", web::post().to(routes::login::login))
-                    .route("/logout", web::post().to(routes::logout::logout))
+                    .route("/auth/login", web::post().to(auth::login::login))
+                    .route("/auth/logout", web::post().to(auth::logout::logout))
+                    .route("/auth/session", web::get().to(auth::session::session))
                     .route("/about", web::get().to(routes::about::about))
                     .route("/beer/drink", web::post().to(routes::beer::drink::drink))
                     .route("/beer/drunk", web::get().to(routes::beer::drunk::drunk))
@@ -42,8 +44,9 @@ async fn main() -> std::io::Result<()> {
                     .route("/payment/broke", web::get().to(routes::payment::broke::broke))
                     .route("/payment/balance", web::get().to(routes::payment::balance::balance))
                     .route("/system/beer-price", web::post().to(routes::system::set_beer_price::set_beer_price))
-                    .route("/system/owes", web::get().to(routes::system::owes::owes))
-                    .route("/system/set-admin", web::post().to(routes::system::set_admin::set_admin)),
+                    .route("/system/users", web::get().to(routes::system::users::owes))
+                    .route("/system/set-admin", web::post().to(routes::system::set_admin::set_admin))
+                    .route("/system/add-user", web::post().to(routes::system::add_user::add_user)),
             )
     })
     .bind("[::]:8080")?

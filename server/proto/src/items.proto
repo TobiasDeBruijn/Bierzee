@@ -4,12 +4,13 @@ package bierzee.items;
 
 message LoginRequest {
   string employeeId = 1;
-  string name = 2;
+  string password = 2;
 }
 
 message LoginResponse {
   string sessionId = 1;
   bool isAdmin = 2;
+  string name = 3;
 }
 
 message DrinkRequest {
@@ -62,7 +63,8 @@ message OwesResponse {
 message OwningUser {
   string employeeId = 1;
   string name = 2;
-  double amountOwed = 3;
+  bool isAdmin = 3;
+  double amountOwed = 4;
 }
 
 message SetAdminRequest {
@@ -78,4 +80,16 @@ message GetAboutResponse {
   string authors = 5;
   string repository = 6;
   string license = 7;
+}
+
+message AddUserRequest {
+  string employeeId = 1;
+  string name = 2;
+  bool isAdmin = 3;
+}
+
+message GetSessionResponse {
+  string name = 1;
+  bool isAdmin = 2;
+  string id = 3;
 }

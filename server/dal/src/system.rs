@@ -1,7 +1,7 @@
 use crate::user::User;
 use crate::{ASql, DalResult};
 use mysql::prelude::Queryable;
-use mysql::{params, Params, Row, TxOpts};
+use mysql::{params, Params, Row, Transaction, TxOpts};
 use std::str::FromStr;
 
 pub struct System {
@@ -13,6 +13,7 @@ const SYSTEM_USER_NAME: &str = "System";
 const DEFAULT_BEER_PRICE: f64 = 0.60;
 
 const OPTION_BEER_PRICE: &str = "beer_price";
+const OPTION_GLOBAL_PASSWORD: &str = "global_password";
 
 pub struct OptionValue<T> {
     pub value: T,
@@ -40,8 +41,32 @@ impl System {
             },
         )?;
 
+        Self::set_default_option(&mut tx, OPTION_GLOBAL_PASSWORD, "pancakes")?;
+
         tx.commit()?;
         Ok(Self { pool })
+    }
+
+    fn set_default_option(tx: &mut Transaction, name: &str, value: &str) -> DalResult<()> {
+        tx.exec_drop(
+            "INSERT IGNORE INTO system (name, value, last_updated, last_updated_by) VALUES (:name, :value, :last_updated, :last_updated_by)",
+            params! {
+                "name" => name,
+                "value" => value,
+                "last_updated" => time::OffsetDateTime::now_utc().unix_timestamp(),
+                "last_updated_by" => SYSTEM_USER_ID,
+            },
+        )?;
+
+        Ok(())
+    }
+
+    pub fn set_global_password(&self, global_password: &str, user: &User) -> DalResult<()> {
+        self.set_option(OPTION_GLOBAL_PASSWORD, global_password, user)
+    }
+
+    pub fn get_global_password(&self) -> DalResult<OptionValue<String>> {
+        Ok(self.get_option(OPTION_GLOBAL_PASSWORD)?.unwrap())
     }
 
     pub fn get_total_beers_consumed(&self) -> DalResult<i64> {
