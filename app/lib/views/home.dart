@@ -1,6 +1,7 @@
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/admin/beer_price.dart';
+import 'package:bierzee/views/components/admin/users.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:bierzee/views/components/home/beer.dart';
 import 'package:bierzee/views/components/home/payment.dart';
@@ -88,10 +89,13 @@ class _HomeViewState extends State<HomeView> {
   Widget _getAdminPage() {
     return Container(
       padding: EdgeInsets.all(8),
-      child: Column(
-        children: [
-          BeerPriceComponent(user: widget.user),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            BeerPriceComponent(user: widget.user),
+            AdminUserComponent(user: widget.user),
+          ],
+        ),
       ),
     );
   }

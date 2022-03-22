@@ -57,15 +57,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<User?> checkAndGetUser() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? userId = sharedPreferences.getString("userId");
-    String? userName = sharedPreferences.getString("userName");
+    String? sessionId = sharedPreferences.getString("sessionId");
 
-    if(userId == null || userName == null) {
+    if(sessionId == null) {
       return null;
     }
 
-    Response<User> user = await User.doLogin(userId, userName);
+    Response<User?> user = await User.getBySession(sessionId);
     if(!user.handleNotOk(context)) {
+      return null;
+    } else if (user.value == null) {
       return null;
     } else {
       return user.value!;

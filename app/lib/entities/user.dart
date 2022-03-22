@@ -22,23 +22,21 @@ class User {
 
   void _setPreferences() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.setString("userId", id);
-    sharedPreferences.setString("userName", name);
+    sharedPreferences.setString("sessionId", sessionId);
   }
 
   void _clearPreferences() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    sharedPreferences.remove("userId");
-    sharedPreferences.remove("userName");
+    sharedPreferences.remove("sessionId");
   }
 
-  static Future<Response<User>> doLogin(String id, String name) async {
+  static Future<Response<User?>> doLogin(String id, String password) async {
     debugPrint('Logging in');
     try {
       proto.LoginRequest loginRequest = proto.LoginRequest(
-          employeeId: id, name: name);
+          employeeId: id, password: password);
       http.Response response = await _CLIENT.post(
-          Uri.parse("$SERVER/api/v1/login"),
+          Uri.parse("$SERVER/api/v1/auth/login"),
           headers: getProtobufHeaders(),
           body: loginRequest.writeToBuffer()
       );
@@ -47,9 +45,39 @@ class User {
         case 200:
           proto.LoginResponse loginResponse = proto.LoginResponse.fromBuffer(
               response.bodyBytes);
-          User user = User._(id: id, name: name, sessionId: loginResponse.sessionId, isAdmin: loginResponse.isAdmin);
+          User user = User._(id: id, name: loginResponse.name, sessionId: loginResponse.sessionId, isAdmin: loginResponse.isAdmin);
           user._setPreferences();
           return Response.ok(user);
+        case 401:
+          return Response.ok(null);
+        case 429:
+          return Response.rateLimit();
+        default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
+          return Response.fail();
+      }
+    } on SocketException catch(e) {
+      debugPrint('SocketException ' + e.toString());
+      return Response.fail();
+    }
+  }
+
+  static Future<Response<User?>> getBySession(String sessionId) async {
+    try {
+      http.Response response = await _CLIENT.get(Uri.parse("$SERVER/api/v1/auth/session"),
+        headers: {
+          'Authorization': sessionId,
+          'Accept': 'application/protobuf'
+        }
+      );
+
+      switch(response.statusCode) {
+        case 200:
+          proto.GetSessionResponse getSessionResponse = proto.GetSessionResponse.fromBuffer(response.bodyBytes);
+          User user = User._(id: getSessionResponse.id, name: getSessionResponse.name, sessionId: sessionId, isAdmin: getSessionResponse.isAdmin);
+          return Response.ok(user);
+        case 401:
+          return Response.ok(null);
         case 429:
           return Response.rateLimit();
         default:
@@ -65,7 +93,7 @@ class User {
   Future<Response<void>> doLogout() async {
     debugPrint('Logging out');
     try {
-      http.Response response = await _CLIENT.post(Uri.parse("$SERVER/api/v1/logout"), headers: getHeaders(sessionId));
+      http.Response response = await _CLIENT.post(Uri.parse("$SERVER/api/v1/auth/logout"), headers: getHeaders(sessionId));
       switch(response.statusCode) {
         case 200:
           _clearPreferences();
@@ -97,6 +125,7 @@ class User {
           return Response.ok(drunkResponse.beers.map((e) => Beer(e.drunkAt.toInt()))
               .toList());
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -121,6 +150,7 @@ class User {
         case 429:
           return Response.rateLimit();
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -146,6 +176,7 @@ class User {
         case 429:
           return Response.rateLimit();
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -172,6 +203,7 @@ class User {
         case 429:
           return Response.rateLimit();
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -200,6 +232,7 @@ class User {
         case 429:
           return Response.rateLimit();
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -224,6 +257,7 @@ class User {
         case 429:
           return Response.rateLimit();
         default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
           return Response.fail();
       }
     } on SocketException catch(e) {
@@ -231,4 +265,42 @@ class User {
       return Response.fail();
     }
   }
+}
+
+class OwningUser {
+
+  final String name;
+  final String id;
+  final bool isAdmin;
+  final double balance;
+
+  static http.Client _CLIENT = http.Client();
+
+  const OwningUser._({required this.name, required this.id, required this.isAdmin, required this.balance});
+
+  static Future<Response<List<OwningUser>>> getUsers(User admin) async {
+    debugPrint('Fetching owning users');
+
+    try {
+      http.Response response = await _CLIENT.get(Uri.parse("$SERVER/api/v1/system/users"),
+        headers: getHeaders(admin.sessionId)
+      );
+
+      switch(response.statusCode) {
+        case 200:
+          proto.OwesResponse owesResponse = proto.OwesResponse.fromBuffer(response.bodyBytes);
+          List<OwningUser> owningUsers = owesResponse.owningUsers.map((e) => OwningUser._(id: e.employeeId, name: e.name, isAdmin: e.isAdmin, balance: e.amountOwed)).toList();
+          return Response.ok(owningUsers);
+        case 429:
+          return Response.rateLimit();
+        default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
+          return Response.fail();
+      }
+    } on SocketException catch(e) {
+      debugPrint('SocketException ' + e.toString());
+      return Response.fail();
+    }
+   }
+
 }

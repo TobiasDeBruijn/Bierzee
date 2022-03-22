@@ -30,7 +30,7 @@ class LoginForm extends StatefulWidget {
 
   final GlobalKey<FormState> _formState = GlobalKey();
   final TextEditingController _employeeIdController = TextEditingController();
-  final TextEditingController _userNameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   _LoginFormState createState() => _LoginFormState();
@@ -53,24 +53,32 @@ class _LoginFormState extends State<LoginForm> {
             ),
           ),
           TextFormField(
-            controller: widget._userNameController,
+            controller: widget._passwordController,
             validator: (value) => requireAllValid(value, [validateLength, validateRequired]),
             autovalidateMode: AutovalidateMode.always,
             decoration: const InputDecoration(
-              labelText: 'Naam'
+              labelText: 'Wachtwoord'
             ),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: ElevatedButton(
-              child: const Text('Continue'),
+              child: const Text('Login'),
               onPressed: () async {
                 if(!widget._formState.currentState!.validate()) {
                   return;
                 }
 
-                Response<User> user = await User.doLogin(widget._employeeIdController.text, widget._userNameController.text);
+                Response<User?> user = await User.doLogin(widget._employeeIdController.text, widget._passwordController.text);
                 if(!user.handleNotOk(context)) {
+                  return;
+                }
+
+                if(user.value == null) {
+                  Future<Null>.delayed(Duration.zero, () {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Verkeerd wachtwoord')));
+                  });
+
                   return;
                 }
 
