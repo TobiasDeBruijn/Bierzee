@@ -1,5 +1,6 @@
 import 'package:bierzee/entities/payment.dart';
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/main.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:bierzee/util/validation.dart';
@@ -22,6 +23,8 @@ class _PaymentComponentState extends State<PaymentComponent> {
   double totalPaid = 0;
   double paidToday = 0;
 
+  bool isLoading = true;
+
   @override
   void initState() {
     super.initState();
@@ -43,59 +46,72 @@ class _PaymentComponentState extends State<PaymentComponent> {
           .where((element) => element.paidAt > startOfTodayEpoch)
           .map((e) => e.amountPaid)
           .sum;
+
+      isLoading = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        elevation: 2,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Card(
+      elevation: 2,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: isLoading ? _getIsLoading() : _getIsLoaded()
+      ),
+    );
+  }
+
+  Widget _getIsLoading() {
+    return Align(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _getIsLoaded() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+                'Totaal betaald:',
+                style: GoogleFonts.oxygen(fontSize: 20)
+            ),
+            Text(
+              '€' + totalPaid.toStringAsFixed(2),
+              style: GoogleFonts.oxygen(fontSize: 20),
+            )
+          ],
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Vandaag betaald:',
+              style: GoogleFonts.oxygen(fontSize: 20),
+            ),
+            Text(
+                '€' + paidToday.toStringAsFixed(2),
+                style: GoogleFonts.oxygen(fontSize: 20)
+            )
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                      'Totaal betaald:',
-                      style: GoogleFonts.oxygen(fontSize: 20)
-                  ),
-                  Text(
-                    '€' + totalPaid.toStringAsFixed(2),
-                    style: GoogleFonts.oxygen(fontSize: 20),
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Vandaag betaald:',
-                    style: GoogleFonts.oxygen(fontSize: 20),
-                  ),
-                  Text(
-                      '€' + paidToday.toStringAsFixed(2),
-                      style: GoogleFonts.oxygen(fontSize: 20)
-                  )
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  ElevatedButton(
-                    child: const Text('Betalen'),
-                    onPressed: () => showPaymentDialog(),
-                  )
-                ],
-              ),
+              ElevatedButton(
+                child: const Text('Betalen'),
+                onPressed: () => showPaymentDialog(),
+              )
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
@@ -152,7 +168,7 @@ class _PaymentDialogState extends State<_PaymentDialog> {
                         ),
                         keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
                         autovalidateMode: AutovalidateMode.always,
-                        validator: (value) => requireAllValid(value, [validateRequired, (string) { return RegExp("^[0-9]*[\\,\\.]{1}[0-9]{2}\$").hasMatch(string!) ? null : 'Invalid'; }]),
+                        validator: (value) => requireAllValid(value, [validateRequired, (string) { return RegExp(REGEXP_DECIMAL).hasMatch(string!) ? null : 'Invalid'; }]),
                       ),
                       ElevatedButton(
                         child: isPaymentLoading ? SizedBox(

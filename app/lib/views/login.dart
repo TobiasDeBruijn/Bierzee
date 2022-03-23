@@ -55,6 +55,7 @@ class _LoginFormState extends State<LoginForm> {
           TextFormField(
             controller: widget._passwordController,
             validator: (value) => requireAllValid(value, [validateLength, validateRequired]),
+            obscureText: true,
             autovalidateMode: AutovalidateMode.always,
             decoration: const InputDecoration(
               labelText: 'Wachtwoord'

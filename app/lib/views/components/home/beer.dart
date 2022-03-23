@@ -97,18 +97,21 @@ class _BeerComponentState extends State<BeerComponent> {
             ),
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              child: consumeBeerLoading ? SizedBox(
-                  height: 20,
-                  width: 20,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-              : const Text('Nog één'),
-              onPressed: () => consumeBeer(),
-            )
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                child: consumeBeerLoading ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                : const Text('Nog één'),
+                onPressed: () => consumeBeer(),
+              )
+            ],
+          ),
         )
       ],
     );

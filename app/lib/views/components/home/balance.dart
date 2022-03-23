@@ -14,7 +14,6 @@ class BalanceComponent extends StatefulWidget {
 }
 
 class BalanceComponentState extends State<BalanceComponent> {
-
   double balance = 0;
   int beersLeft = 0;
 
@@ -28,7 +27,7 @@ class BalanceComponentState extends State<BalanceComponent> {
 
   void getValues() async {
     Response<PaymentBalance> balance = await widget.user.getPaymentBalance();
-    if(!balance.handleNotOk(context)) {
+    if (!balance.handleNotOk(context)) {
       return;
     }
 
@@ -46,31 +45,42 @@ class BalanceComponentState extends State<BalanceComponent> {
       child: Card(
         elevation: 2,
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Balans:',
-                    style: GoogleFonts.oxygen(fontSize: 25),
-                  ),
-                  Text(
-                    '€' + balance.toStringAsFixed(2),
-                    style: GoogleFonts.oxygen(fontSize: 25),
-                  )
-                ],
-              ),
-              Text(
-                'Dat zijn $beersLeft biertjes',
-                style: GoogleFonts.oxygen(),
-              ),
-            ],
-          ),
+          padding: EdgeInsets.all(16),
+          child: isLoading ? _getIsLoading() : _getIsLoaded(),
         ),
       ),
+    );
+  }
+
+  Widget _getIsLoading() {
+    return Align(
+      alignment: Alignment.center,
+      child: CircularProgressIndicator(),
+    );
+  }
+
+  Widget _getIsLoaded() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Balans:',
+              style: GoogleFonts.oxygen(fontSize: 35),
+            ),
+            Text(
+              '€' + balance.toStringAsFixed(2),
+              style: GoogleFonts.oxygen(fontSize: 35),
+            )
+          ],
+        ),
+        Text(
+          'Dat zijn $beersLeft biertjes',
+          style: GoogleFonts.oxygen(),
+        ),
+      ],
     );
   }
 }

@@ -3,6 +3,7 @@
 import 'package:bierzee/entities/beer.dart';
 import 'package:bierzee/entities/system.dart';
 import 'package:bierzee/entities/user.dart';
+import 'package:bierzee/main.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +30,6 @@ class _BeerPriceState extends State<BeerPriceComponent> {
 
   bool isLoading = true;
 
-
   @override
   void initState() {
     super.initState();
@@ -46,7 +46,6 @@ class _BeerPriceState extends State<BeerPriceComponent> {
       currentBeerPrice = beerPrice.value!.price;
       lastChangedAt = beerPrice.value!.lastUpdated;
       lastChangedBy = beerPrice.value!.lastChangedBy;
-
       isLoading = false;
     });
   }
@@ -59,12 +58,12 @@ class _BeerPriceState extends State<BeerPriceComponent> {
         elevation: 2,
         child: Padding(
           padding: EdgeInsets.all(16.0),
-          child: isLoading ? getIsLoading() : getLoaded(),
+          child: isLoading ? _getIsLoading() : _getIsLoaded(),
         ),
       ),
     );  }
 
-  Widget getLoaded() {
+  Widget _getIsLoaded() {
     final DateTime dtLastChangedAt = DateTime.fromMillisecondsSinceEpoch(lastChangedAt * 1000, isUtc: true).toLocal();
     final DateFormat dateFormat = DateFormat('dd/MM/yyyy');
 
@@ -110,20 +109,23 @@ class _BeerPriceState extends State<BeerPriceComponent> {
             )
           ],
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              child: const Text('Wijzigen'),
-              onPressed: () => openChangePriceDialog(),
-            )
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                child: const Text('Wijzigen'),
+                onPressed: () => openChangePriceDialog(),
+              )
+            ],
+          ),
         )
       ],
     );
   }
 
-  Widget getIsLoading() {
+  Widget _getIsLoading() {
     return Align(
       alignment: Alignment.center,
       child: CircularProgressIndicator(),
@@ -187,7 +189,7 @@ class _ChangeBeerPriceDialogState extends State<_ChangeBeerPriceDialog> {
                         ),
                         keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
                         autovalidateMode: AutovalidateMode.always,
-                        validator: (value) => requireAllValid(value, [validateRequired, (string) { return RegExp("^[0-9]*[\\,\\.]{1}[0-9]{2}\$").hasMatch(string!) ? null : 'Invalid'; }]),
+                        validator: (value) => requireAllValid(value, [validateRequired, (string) { return RegExp(REGEXP_DECIMAL).hasMatch(string!) ? null : 'Invalid'; }]),
                       ),
                       ElevatedButton(
                         child: isUpdating ? SizedBox(

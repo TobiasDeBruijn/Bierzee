@@ -16,12 +16,11 @@ class AdminUserComponent extends StatefulWidget {
 }
 
 class _UserComponentState extends State<AdminUserComponent> {
+
+  /// A list of users
+  /// The first Row is the table header
   List<TableRow> users = [
     TableRow(children: [
-      Text(
-        'Nummer',
-        style: GoogleFonts.oxygen(fontWeight: FontWeight.bold),
-      ),
       Text(
         'Naam',
         style: GoogleFonts.oxygen(fontWeight: FontWeight.bold),
@@ -32,6 +31,8 @@ class _UserComponentState extends State<AdminUserComponent> {
       )
     ])
   ];
+
+  /// Whether the users are still being loaded in
   bool isLoading = true;
 
   @override
@@ -47,13 +48,14 @@ class _UserComponentState extends State<AdminUserComponent> {
       child: Card(
         elevation: 2,
         child: Padding(
-          padding: EdgeInsets.all(8),
+          padding: EdgeInsets.all(16),
           child: isLoading ? _getIsLoading() : _getIsLoaded(),
         ),
       ),
     );
   }
 
+  /// The widget to be displayed while loading
   Widget _getIsLoading() {
     return Align(
       alignment: Alignment.center,
@@ -61,26 +63,32 @@ class _UserComponentState extends State<AdminUserComponent> {
     );
   }
 
+  /// The widget to be displayed when loaded
   Widget _getIsLoaded() {
     return Column(
       mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Table(
           children: users,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            ElevatedButton(
-              child: const Text('Gebruiker aanmaken'),
-              onPressed: () => _openCreateUserDialog(),
-            )
-          ],
+        Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton(
+                child: const Text('Gebruiker aanmaken'),
+                onPressed: () => _openCreateUserDialog(),
+              )
+            ],
+          ),
         )
       ],
     );
   }
 
+  /// Get, and set, the values from the server
   void getValues() async {
     Response<List<OwningUser>> response =
         await OwningUser.getUsers(widget.user);
@@ -104,13 +112,6 @@ class _UserComponentState extends State<AdminUserComponent> {
   TableRow _buildTableRow(OwningUser user) {
     return TableRow(
       children: [
-        Padding(
-          padding: const EdgeInsets.only(top: 8.0),
-          child: Text(
-            user.id,
-            style: GoogleFonts.oxygen(),
-          ),
-        ),
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
