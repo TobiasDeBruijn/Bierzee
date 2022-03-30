@@ -1,9 +1,10 @@
 use crate::beer::Beer;
 use crate::payment::Payment;
 use crate::session::UserSession;
-use crate::{ASql, DalResult};
+use crate::{ASql, DalResult, PaymentDeniedStatus};
 use mysql::prelude::Queryable;
 use mysql::{params, Row};
+use rand::Rng;
 
 pub struct User {
     pool: ASql,
@@ -89,17 +90,23 @@ impl User {
     pub fn get_payments(&self) -> DalResult<Vec<Payment>> {
         let mut conn = self.pool.get_conn()?;
         let rows: Vec<Row> = conn.exec(
-            "SELECT paid_at,amount_paid FROM payments WHERE user_id = :user_id",
+            "SELECT payment_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE user_id = :user_id",
             params! {
                 "user_id" => &self.employee_number
             },
         )?;
         let payments = rows
             .into_iter()
-            .map(|x| Payment {
-                paid_by: self.employee_number.clone(),
-                paid_at: x.get("paid_at").unwrap(),
-                amount_paid: x.get("amount_paid").unwrap(),
+            .map(|x| {
+                let denied: bool = x.get("denied").unwrap();
+                let denied_by: Option<String> = x.get("denied_by").unwrap();
+                Payment {
+                    payment_id: x.get("payment_id").unwrap(),
+                    paid_by: self.employee_number.clone(),
+                    paid_at: x.get("paid_at").unwrap(),
+                    amount_paid: x.get("amount_paid").unwrap(),
+                    denied: PaymentDeniedStatus::new(denied, denied_by)
+                }
             })
             .collect::<Vec<_>>();
         Ok(payments)
@@ -107,9 +114,11 @@ impl User {
 
     pub fn pay(&self, paid_at: i64, amount: f64) -> DalResult<()> {
         let mut conn = self.pool.get_conn()?;
+        let payment_id: String = rand::thread_rng().sample_iter(rand::distributions::Alphanumeric).take(32).map(char::from).collect();
         conn.exec_drop(
-            "INSERT INTO payments (user_id, paid_at, amount_paid) VALUES (:user_id, :paid_at, :amount_paid)",
+            "INSERT INTO payments (payment_id, user_id, paid_at, amount_paid) VALUES (:user_id, :paid_at, :amount_paid)",
             params! {
+                "payment_id" => &payment_id,
                 "user_id" => &self.employee_number,
                 "paid_at" => paid_at,
                 "amount_paid" => amount

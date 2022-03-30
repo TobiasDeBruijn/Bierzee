@@ -6,7 +6,8 @@ use actix_web::{App, HttpServer, web};
 use std::sync::Arc;
 use tracing::{debug, info, trace};
 use tracing_actix_web::TracingLogger;
-use routes::auth;
+use routes::v1;
+use crate::routes::routable::Routable;
 
 mod appdata;
 mod config;
@@ -33,20 +34,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Governor::new(&GovernorConfig::default()))
             .service(
                 web::scope("/api/v1")
-                    .route("/auth/login", web::post().to(auth::login::login))
-                    .route("/auth/logout", web::post().to(auth::logout::logout))
-                    .route("/auth/session", web::get().to(auth::session::session))
-                    .route("/about", web::get().to(routes::about::about))
-                    .route("/beer/drink", web::post().to(routes::beer::drink::drink))
-                    .route("/beer/drunk", web::get().to(routes::beer::drunk::drunk))
-                    .route("/beer/price", web::get().to(routes::beer::price::price))
-                    .route("/payment/pay", web::post().to(routes::payment::pay::pay))
-                    .route("/payment/broke", web::get().to(routes::payment::broke::broke))
-                    .route("/payment/balance", web::get().to(routes::payment::balance::balance))
-                    .route("/system/beer-price", web::post().to(routes::system::set_beer_price::set_beer_price))
-                    .route("/system/users", web::get().to(routes::system::users::owes))
-                    .route("/system/set-admin", web::post().to(routes::system::set_admin::set_admin))
-                    .route("/system/add-user", web::post().to(routes::system::add_user::add_user)),
+                    .configure(v1::V1Router::configure)
             )
     })
     .bind("[::]:8080")?

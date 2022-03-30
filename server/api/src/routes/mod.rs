@@ -8,11 +8,8 @@ use std::future::Future;
 use std::ops::Deref;
 use std::pin::Pin;
 
-pub mod beer;
-pub mod payment;
-pub mod system;
-pub mod about;
-pub mod auth;
+pub mod v1;
+pub mod routable;
 
 fn get_header(req: &HttpRequest, header: &str) -> Option<String> {
     let value = req.headers().get(header)?;

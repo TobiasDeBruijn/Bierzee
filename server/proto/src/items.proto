@@ -2,6 +2,11 @@ syntax = "proto3";
 
 package bierzee.items;
 
+message User {
+  string employee_id = 1;
+  string name = 2;
+}
+
 message LoginRequest {
   string employeeId = 1;
   string password = 2;
@@ -36,6 +41,9 @@ message BrokeResponse {
 message Payment {
   int64 paidAt = 1;
   double amountPaid = 2;
+  bool denied = 3;
+  User paidBy = 4;
+  optional User denied_by = 5;
 }
 
 message GetBeerPriceResponse {
@@ -92,4 +100,13 @@ message GetSessionResponse {
   string name = 1;
   bool isAdmin = 2;
   string id = 3;
+}
+
+message ListPaymentResponse {
+  repeated Payment payments = 1;
+}
+
+message DenyPaymentRequest {
+  string paymentId = 1;
+  bool denied = 2;
 }
