@@ -110,3 +110,19 @@ message DenyPaymentRequest {
   string paymentId = 1;
   bool denied = 2;
 }
+
+message Notification {
+  string id = 1;
+  string user_id = 2;
+  string text = 3;
+  int64 created_at = 4;
+}
+
+message ListNotificationResponse {
+  repeated Notification notifications = 1;
+}
+
+message CompleteNotificationRequest {
+  string notificationId = 1;
+  bool completed = 2;
+}

@@ -7,6 +7,7 @@ mod payment;
 mod system;
 mod auth;
 mod about;
+mod notification;
 
 pub struct V1Router;
 
@@ -19,6 +20,7 @@ impl Routable for V1Router {
                 .configure(beer::BeerRouter::configure)
                 .configure(payment::PaymentRouter::configure)
                 .configure(system::SystemRouter::configure)
+                .configure(notification::NotificationRouter::configure)
             );
     }
 }

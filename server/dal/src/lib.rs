@@ -4,6 +4,7 @@ mod payment;
 mod session;
 mod system;
 mod user;
+mod notification;
 
 pub use _mysql::*;
 pub use beer::*;
@@ -11,6 +12,7 @@ pub use payment::*;
 pub use session::*;
 pub use system::*;
 pub use user::*;
+pub use notification::*;
 
 use thiserror::Error;
 
