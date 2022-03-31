@@ -20,7 +20,7 @@ impl Routable for SystemRouter {
                 .route("/set-admin", web::post().to(set_admin::set_admin))
                 .route("/add-user", web::post().to(add_user::add_user))
                 .route("/payments", web::get().to(list_payments::list_payments))
-                .route("/deny-payment/{payment_id}", web::post().to(deny_payment::deny_payment))
+                .route("/deny-payment", web::post().to(deny_payment::deny_payment))
             );
     }
 }

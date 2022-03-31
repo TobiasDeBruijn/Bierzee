@@ -1,18 +1,25 @@
 use actix_multiresponse::Payload;
+use actix_web::web;
 use dal::{Payment, PaymentDeniedStatus, User};
 use proto::ListPaymentResponse;
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
 use crate::routes::Session;
+use serde::Deserialize;
 
-pub async fn list_payments(data: WebData, session: Session) -> WebResult<Payload<ListPaymentResponse>> {
+#[derive(Deserialize)]
+pub struct Query {
+    max: Option<usize>,
+}
+
+pub async fn list_payments(data: WebData, session: Session, query: web::Query<Query>) -> WebResult<Payload<ListPaymentResponse>> {
     let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
     if !authorized_user.is_admin {
         return Err(Error::Forbidden("Not an administrator"));
     }
 
     let payments = Payment::list(data.mysql.clone())?;
-    let payments = payments.into_iter()
+    let mut payments = payments.into_iter()
         .map(|x| {
             let denied_by = match x.denied {
                 PaymentDeniedStatus::Denied(user_id) => {
@@ -36,10 +43,21 @@ pub async fn list_payments(data: WebData, session: Session) -> WebResult<Payload
                     name: paid_by_user.name,
                 }),
                 denied_by,
+                payment_id: x.payment_id,
             })
         })
         .collect::<Result<Vec<_>, Error>>()?;
-    
+
+    payments.sort_by(|a, b| a.paid_at.cmp(&b.paid_at));
+
+    if let Some(max) = query.max {
+        if max < payments.len() {
+            // split_off changes the original vec to be 0..max,
+            // The returned value is max..len, we don't care for that
+            let _ = payments.split_off(max);
+        }
+    }
+
     Ok(Payload(ListPaymentResponse {
         payments
     }))

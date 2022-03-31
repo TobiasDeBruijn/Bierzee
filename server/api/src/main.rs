@@ -1,7 +1,7 @@
 use crate::appdata::AppData;
 use crate::config::Config;
 use actix_cors::Cors;
-use actix_governor::{Governor, GovernorConfig};
+use actix_governor::{Governor, GovernorConfig, GovernorConfigBuilder, PeerIpKeyExtractor};
 use actix_web::{App, HttpServer, web};
 use std::sync::Arc;
 use tracing::{debug, info, trace};
@@ -31,9 +31,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(webdata.clone())
             .wrap(TracingLogger::default())
             .wrap(Cors::permissive())
-            .wrap(Governor::new(&GovernorConfig::default()))
+            .wrap(Governor::new(&config_governor()))
             .service(
-                web::scope("/api/v1")
+                web::scope("/api")
                     .configure(v1::V1Router::configure)
             )
     })
@@ -42,6 +42,14 @@ async fn main() -> std::io::Result<()> {
 
     info!("Startup complete");
     server.await
+}
+
+fn config_governor() -> GovernorConfig<PeerIpKeyExtractor> {
+    GovernorConfigBuilder::const_default()
+        .const_per_second(10)
+        .const_burst_size(128)
+        .finish()
+        .unwrap()
 }
 
 fn init_tracing() {

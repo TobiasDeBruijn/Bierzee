@@ -116,7 +116,7 @@ impl User {
         let mut conn = self.pool.get_conn()?;
         let payment_id: String = rand::thread_rng().sample_iter(rand::distributions::Alphanumeric).take(32).map(char::from).collect();
         conn.exec_drop(
-            "INSERT INTO payments (payment_id, user_id, paid_at, amount_paid) VALUES (:user_id, :paid_at, :amount_paid)",
+            "INSERT INTO payments (payment_id, user_id, paid_at, amount_paid) VALUES (:payment_id, :user_id, :paid_at, :amount_paid)",
             params! {
                 "payment_id" => &payment_id,
                 "user_id" => &self.employee_number,

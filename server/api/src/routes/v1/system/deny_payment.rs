@@ -17,7 +17,12 @@ pub async fn deny_payment(data: WebData, session: Session, payload: Payload<Deny
     payment.set_denied(data.mysql.clone(), payload.denied, denied_by)?;
 
     // Issue a notification for the user
-    Notification::new(data.mysql.clone(), &payment.paid_by, &format!("Betaling van €{:.2} geweigerd door {}", payment.amount_paid., authorized_user.name))?;
+    let text = if payload.denied {
+        format!("Betaling van €{:.2} geweigerd door {}", payment.amount_paid, authorized_user.name)
+    } else {
+        format!("Betaling van €{:.2} geaccepteerd door {}", payment.amount_paid, authorized_user.name)
+    };
+    Notification::new(data.mysql.clone(), &payment.paid_by, &text)?;
 
     Ok(Empty)
 }

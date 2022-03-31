@@ -8,6 +8,7 @@ use crate::routes::Session;
 pub async fn list(data: WebData, session: Session) -> WebResult<Payload<ListNotificationResponse>> {
     let notifications = Notification::list(data.mysql.clone(), &session.user)?;
     let notifications = notifications.into_iter()
+        .filter(|x| !x.completed)
         .map(|x| proto::Notification {
             id: x.id,
             created_at: x.created_at,

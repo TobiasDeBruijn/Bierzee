@@ -41,5 +41,6 @@ pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebR
             employee_id: paid_by_user.employee_number,
         }),
         denied_by,
+        payment_id: payment.payment_id,
     }))
 }

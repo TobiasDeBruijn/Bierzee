@@ -33,6 +33,7 @@ pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeRe
                     name: paid_by_user.name,
                 }),
                 denied_by,
+                payment_id: x.payment_id,
             })
         })
         .collect::<Result<Vec<_>, Error>>()?;

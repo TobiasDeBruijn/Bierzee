@@ -43,7 +43,8 @@ message Payment {
   double amountPaid = 2;
   bool denied = 3;
   User paidBy = 4;
-  optional User denied_by = 5;
+  optional User deniedBy = 5;
+  string paymentId = 6;
 }
 
 message GetBeerPriceResponse {

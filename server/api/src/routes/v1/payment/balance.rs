@@ -2,13 +2,18 @@ use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
 use crate::routes::Session;
 use actix_multiresponse::Payload;
-use dal::{System, User};
+use dal::{PaymentDeniedStatus, System, User};
 use proto::BalanceResponse;
 
 pub async fn balance(data: WebData, session: Session) -> WebResult<Payload<BalanceResponse>> {
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
 
-    let amount_paid: f64 = user.get_payments()?.into_iter().map(|x| x.amount_paid).sum();
+    let amount_paid: f64 = user.get_payments()?.into_iter()
+        .filter(|x| match x.denied {
+            PaymentDeniedStatus::Denied(_) => false,
+            _ => true
+        })
+        .map(|x| x.amount_paid).sum();
     let beers_drunk = user.get_beers()?.len() as i64;
 
     let system = System::new(data.mysql.clone())?;
