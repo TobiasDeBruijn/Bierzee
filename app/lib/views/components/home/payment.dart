@@ -32,7 +32,7 @@ class _PaymentComponentState extends State<PaymentComponent> {
   }
 
   void getValues() async {
-    Response<List<Payment>> payments = await widget.user.getPayments();
+    Response<List<PaymentEntity>> payments = await widget.user.getPayments();
     if(!payments.handleNotOk(context)) {
       return;
     }

@@ -8,6 +8,13 @@ import 'package:http/http.dart' as http;
 import 'package:bierzee/proto/items.pb.dart' as proto;
 import 'package:shared_preferences/shared_preferences.dart';
 
+class NamedUserEntity {
+  final String employeeId;
+  final String name;
+
+  const NamedUserEntity({required this.employeeId, required this.name});
+}
+
 class User {
 
   final String id;
@@ -185,7 +192,7 @@ class User {
     }
   }
 
-  Future<Response<List<Payment>>> getPayments() async {
+  Future<Response<List<PaymentEntity>>> getPayments() async {
     debugPrint('Fetching payments');
     try {
       http.Response response = await _CLIENT.get(
@@ -197,9 +204,17 @@ class User {
         case 200:
           proto.BrokeResponse brokeResponse = proto.BrokeResponse.fromBuffer(
               response.bodyBytes);
-          return Response.ok(brokeResponse.payments.map((e) =>
-              Payment(amountPaid: e.amountPaid, paidAt: e.paidAt.toInt()))
-              .toList());
+
+          List<PaymentEntity> paymentEntities = brokeResponse.payments.map((e) {
+            NamedUserEntity? deniedBy;
+            if(e.denied) {
+              deniedBy = NamedUserEntity(employeeId: e.deniedBy.employeeId, name: e.deniedBy.name);
+            }
+
+            return PaymentEntity(amountPaid: e.amountPaid, paidAt: e.paidAt.toInt(), denied: e.denied, paidBy: NamedUserEntity(name: e.paidBy.name, employeeId: e.paidBy.employeeId), deniedBy: deniedBy, paymentId: e.paymentId);
+          }).toList();
+
+          return Response.ok(paymentEntities);
         case 429:
           return Response.rateLimit();
         default:

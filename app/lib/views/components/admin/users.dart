@@ -69,6 +69,10 @@ class _UserComponentState extends State<AdminUserComponent> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Text(
+          'Gebruikers',
+          style: GoogleFonts.oxygen(fontWeight: FontWeight.bold),
+        ),
         Table(
           children: users,
         ),

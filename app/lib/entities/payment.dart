@@ -1,8 +1,14 @@
-class Payment {
+import 'package:bierzee/entities/user.dart';
+
+class PaymentEntity {
   final double amountPaid;
   final int paidAt;
+  final bool denied;
+  final NamedUserEntity paidBy;
+  final NamedUserEntity? deniedBy;
+  final String paymentId;
 
-  const Payment({required this.amountPaid, required this.paidAt});
+  const PaymentEntity({required this.amountPaid, required this.paidAt, required this.denied, required this.paidBy, required this.paymentId, this.deniedBy});
 }
 
 class PaymentBalance {
