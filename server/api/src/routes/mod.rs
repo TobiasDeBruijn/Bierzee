@@ -3,7 +3,7 @@ use crate::error::Error;
 use actix_web::body::BoxBody;
 use actix_web::dev::Payload;
 use actix_web::{FromRequest, HttpRequest, HttpResponse, Responder};
-use dal::UserSession;
+use dal::{User, UserSession};
 use std::future::Future;
 use std::ops::Deref;
 use std::pin::Pin;
@@ -50,6 +50,38 @@ impl FromRequest for Session {
 
             if time::OffsetDateTime::now_utc().unix_timestamp() > session.expires_at {
                 return Err(Error::Unauthorized("Session has expired"));
+            }
+
+            Ok(Self(session))
+        })
+    }
+}
+
+pub struct AdminSession(Session);
+
+impl Deref for AdminSession {
+    type Target = Session;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
+impl FromRequest for AdminSession {
+    type Error = Error;
+    type Future = Pin<Box<dyn Future<Output = Result<Self, Self::Error>>>>;
+
+    fn from_request(req: &HttpRequest, payload: &mut Payload) -> Self::Future {
+        let session = Session::from_request(req, payload);
+        let req = req.clone();
+
+        Box::pin(async move {
+            let session = session.await?;
+            let data: &WebData = req.app_data().unwrap();
+
+            let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
+            if !authorized_user.is_admin {
+                return Err(Error::Forbidden("Not an administrator"));
             }
 
             Ok(Self(session))

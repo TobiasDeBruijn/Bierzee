@@ -2,15 +2,10 @@ use actix_multiresponse::Payload;
 use dal::{User, UserBuildable};
 use proto::AddUserRequest;
 use crate::appdata::WebData;
-use crate::error::{Error, WebResult};
-use crate::routes::{Empty, Session};
+use crate::error::WebResult;
+use crate::routes::{Empty, AdminSession};
 
-pub async fn add_user(data: WebData, payload: Payload<AddUserRequest>, session: Session) -> WebResult<Empty> {
-    let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
-    if !authorized_user.is_admin {
-        return Err(Error::Forbidden("Not an administrator"));
-    }
-
+pub async fn add_user(data: WebData, payload: Payload<AddUserRequest>, _: AdminSession) -> WebResult<Empty> {
     let new_user = User::create(data.mysql.clone(), UserBuildable {
         name: payload.name.clone(),
         employee_number: payload.employee_id.clone()

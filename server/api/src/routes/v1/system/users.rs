@@ -1,16 +1,11 @@
 use crate::appdata::WebData;
-use crate::error::{Error, WebResult};
-use crate::routes::Session;
+use crate::error::WebResult;
+use crate::routes::AdminSession;
 use actix_multiresponse::Payload;
 use dal::{System, SYSTEM_USER_ID, User};
 use proto::OwesResponse;
 
-pub async fn owes(data: WebData, session: Session) -> WebResult<Payload<OwesResponse>> {
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
-    if !user.is_admin {
-        return Err(Error::Forbidden("Not an administrator"));
-    }
-
+pub async fn owes(data: WebData, _: AdminSession) -> WebResult<Payload<OwesResponse>> {
     let system = System::new(data.mysql.clone())?;
     let owning_users = system
         .get_users()?

@@ -4,7 +4,7 @@ use dal::{Payment, PaymentDeniedStatus, User};
 use proto::ListPaymentResponse;
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
-use crate::routes::Session;
+use crate::routes::AdminSession;
 use serde::Deserialize;
 
 #[derive(Deserialize)]
@@ -12,11 +12,7 @@ pub struct Query {
     max: Option<usize>,
 }
 
-pub async fn list_payments(data: WebData, session: Session, query: web::Query<Query>) -> WebResult<Payload<ListPaymentResponse>> {
-    let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
-    if !authorized_user.is_admin {
-        return Err(Error::Forbidden("Not an administrator"));
-    }
+pub async fn list_payments(data: WebData, _: AdminSession, query: web::Query<Query>) -> WebResult<Payload<ListPaymentResponse>> {
 
     let payments = Payment::list(data.mysql.clone())?;
     let mut payments = payments.into_iter()

@@ -127,3 +127,20 @@ message CompleteNotificationRequest {
   string notificationId = 1;
   bool completed = 2;
 }
+
+message PurchaseBeerRequest {
+  double amountPaid = 1;
+  uint32 cratesPurchased = 2;
+}
+
+message GetBeerStockResponse {
+  repeated BeerStockEntry stockEntries = 1;
+  int64 bottlesLeft = 2;
+  double paymentBalance = 3;
+}
+
+message BeerStockEntry {
+  uint32 crates = 1;
+  User purchasedBy = 2;
+  int64 purchasedAt = 3;
+}

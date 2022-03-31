@@ -8,6 +8,7 @@ mod set_beer_price;
 mod add_user;
 mod list_payments;
 mod deny_payment;
+mod beer;
 
 pub struct SystemRouter;
 
