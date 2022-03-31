@@ -4,7 +4,9 @@ import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/home.dart';
 import 'package:bierzee/views/login.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:new_version/new_version.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -18,6 +20,11 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if(kReleaseMode) {
+      NewVersion newVersion = NewVersion(iOSAppStoreCountry: "NL");
+      newVersion.showAlertIfNecessary(context: context);
+    }
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(

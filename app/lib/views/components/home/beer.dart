@@ -107,7 +107,7 @@ class _BeerComponentState extends State<BeerComponent> {
                     height: 20,
                     width: 20,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                : const Text('Nog één'),
+                : const Text('Ahhh, nog ééntje dan'),
                 onPressed: () => consumeBeer(),
               )
             ],
