@@ -22,6 +22,7 @@ impl Routable for SystemRouter {
                 .route("/add-user", web::post().to(add_user::add_user))
                 .route("/payments", web::get().to(list_payments::list_payments))
                 .route("/deny-payment", web::post().to(deny_payment::deny_payment))
+                .configure(beer::BeerRouter::configure)
             );
     }
 }
