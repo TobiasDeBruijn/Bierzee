@@ -121,4 +121,49 @@ class System {
       return Response.fail();
     }
   }
+
+  Future<Response<proto.GetBeerStockResponse>> getBeerStock() async {
+    try {
+     http.Response response = await _CLIENT.get(Uri.parse("$SERVER/api/v1/system/beer/stock"),
+      headers: getHeaders(user.sessionId)
+     );
+
+     switch(response.statusCode) {
+       case 200:
+        proto.GetBeerStockResponse beerStockResponse = proto.GetBeerStockResponse.fromBuffer(response.bodyBytes);
+        return Response.ok(beerStockResponse);
+       case 429:
+         return Response.rateLimit();
+       default:
+         debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
+         return Response.fail();
+     }
+    } on SocketException catch(e) {
+      debugPrint('SocketException ' + e.toString());
+      return Response.fail();
+    }
+  }
+
+  Future<Response<void>> purchaseBeerStock(int cratesPurchased, double amountPaid) async {
+    try {
+      proto.PurchaseBeerRequest purchaseBeerRequest = proto.PurchaseBeerRequest(amountPaid: amountPaid, cratesPurchased: cratesPurchased);
+      http.Response response = await _CLIENT.post(Uri.parse("$SERVER/api/v1/system/beer/purchase"),
+        headers: getHeaders(user.sessionId),
+        body: purchaseBeerRequest.writeToBuffer()
+      );
+
+      switch(response.statusCode) {
+        case 200:
+          return Response.ok(null);
+        case 429:
+          return Response.rateLimit();
+        default:
+          debugPrint('Got status ' + response.statusCode.toString() + ' :' + response.body);
+          return Response.fail();
+      }
+    } on SocketException catch(e) {
+      debugPrint('SocketException ' + e.toString());
+      return Response.fail();
+    }
+  }
 }

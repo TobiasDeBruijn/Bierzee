@@ -1,6 +1,7 @@
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/admin/beer_price.dart';
+import 'package:bierzee/views/components/admin/crates.dart';
 import 'package:bierzee/views/components/admin/recent_payments.dart';
 import 'package:bierzee/views/components/admin/users.dart';
 import 'package:bierzee/views/components/home/balance.dart';
@@ -96,6 +97,7 @@ class _HomeViewState extends State<HomeView> {
           BeerPriceComponent(user: widget.user),
           AdminUserComponent(user: widget.user),
           RecentPaymentsComponent(user: widget.user),
+          AdminCrateComponent(user: widget.user),
         ],
       ),
     );
