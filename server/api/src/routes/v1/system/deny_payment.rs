@@ -4,7 +4,9 @@ use crate::error::{Error, WebResult};
 use crate::routes::{AdminSession, Empty};
 use dal::{Notification, Payment, User};
 use proto::DenyPaymentRequest;
+use tracing::instrument;
 
+#[instrument]
 pub async fn deny_payment(data: WebData, session: AdminSession, payload: Payload<DenyPaymentRequest>) -> WebResult<Empty> {
     let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
 

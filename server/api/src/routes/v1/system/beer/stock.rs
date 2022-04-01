@@ -4,7 +4,9 @@ use proto::GetBeerStockResponse;
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
 use crate::routes::AdminSession;
+use tracing::instrument;
 
+#[instrument]
 pub async fn stock(data: WebData, _: AdminSession) -> WebResult<Payload<GetBeerStockResponse>> {
     let stock = BeerStock::list(data.mysql.clone())?;
     let stock = stock.into_iter()

@@ -4,7 +4,9 @@ use proto::AddUserRequest;
 use crate::appdata::WebData;
 use crate::error::WebResult;
 use crate::routes::{Empty, AdminSession};
+use tracing::instrument;
 
+#[instrument]
 pub async fn add_user(data: WebData, payload: Payload<AddUserRequest>, _: AdminSession) -> WebResult<Empty> {
     let new_user = User::create(data.mysql.clone(), UserBuildable {
         name: payload.name.clone(),

@@ -5,12 +5,14 @@ use dal::{Payment, PaymentDeniedStatus, User};
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
 use crate::routes::Session;
+use tracing::instrument;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Path {
     payment_id: String
 }
 
+#[instrument]
 pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebResult<Payload<proto::Payment>> {
     let payment = Payment::get_by_id(data.mysql.clone(), &path.payment_id)?.ok_or(Error::NotFound("Payment not found"))?;
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::NotFound("User not found"))?;

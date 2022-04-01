@@ -4,7 +4,9 @@ use crate::routes::{Empty, Session};
 use actix_multiresponse::Payload;
 use dal::User;
 use proto::DrinkRequest;
+use tracing::instrument;
 
+#[instrument]
 pub async fn drink(data: WebData, session: Session, payload: Payload<DrinkRequest>) -> WebResult<Empty> {
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
 

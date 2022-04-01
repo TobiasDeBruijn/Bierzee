@@ -26,6 +26,7 @@ impl Responder for Empty {
     }
 }
 
+#[derive(Debug)]
 pub struct Session(UserSession);
 
 impl Deref for Session {
@@ -57,6 +58,7 @@ impl FromRequest for Session {
     }
 }
 
+#[derive(Debug)]
 pub struct AdminSession(Session);
 
 impl Deref for AdminSession {

@@ -3,7 +3,9 @@ use crate::error::{Error, WebResult};
 use actix_multiresponse::Payload;
 use dal::{User, SYSTEM_USER_ID, System};
 use proto::{LoginRequest, LoginResponse};
+use tracing::instrument;
 
+#[instrument]
 pub async fn login(data: WebData, payload: Payload<LoginRequest>) -> WebResult<Payload<LoginResponse>> {
     if payload.employee_id.eq(&SYSTEM_USER_ID) {
         return Err(Error::Unauthorized("May not log in as system user"));

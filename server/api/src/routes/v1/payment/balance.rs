@@ -4,7 +4,9 @@ use crate::routes::Session;
 use actix_multiresponse::Payload;
 use dal::{PaymentDeniedStatus, System, User};
 use proto::BalanceResponse;
+use tracing::instrument;
 
+#[instrument]
 pub async fn balance(data: WebData, session: Session) -> WebResult<Payload<BalanceResponse>> {
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
 

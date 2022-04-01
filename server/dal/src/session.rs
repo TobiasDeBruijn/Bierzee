@@ -7,6 +7,7 @@ use rand::Rng;
 const SESSION_ID_LENGTH: usize = 32;
 const SESSION_EXPIRY_SECS: i64 = 2_592_000; // 30 days;
 
+#[derive(Debug)]
 pub struct UserSession {
     pool: ASql,
     pub id: String,

@@ -4,7 +4,9 @@ use crate::routes::Session;
 use actix_multiresponse::Payload;
 use dal::{PaymentDeniedStatus, User};
 use proto::BrokeResponse;
+use tracing::instrument;
 
+#[instrument]
 pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeResponse>> {
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
     let payments = user.get_payments()?;

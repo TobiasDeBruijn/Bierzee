@@ -5,7 +5,9 @@ use actix_multiresponse::Payload;
 use tracing::info;
 use dal::{System, User};
 use proto::GetBeerPriceResponse;
+use tracing::instrument;
 
+#[instrument]
 pub async fn price(data: WebData, _: Session) -> WebResult<Payload<GetBeerPriceResponse>> {
     let system = System::new(data.mysql.clone())?;
     let beer_price = system.get_beer_price()?;

@@ -6,14 +6,15 @@ use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
 use crate::routes::AdminSession;
 use serde::Deserialize;
+use tracing::instrument;
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct Query {
     max: Option<usize>,
 }
 
+#[instrument]
 pub async fn list_payments(data: WebData, _: AdminSession, query: web::Query<Query>) -> WebResult<Payload<ListPaymentResponse>> {
-
     let payments = Payment::list(data.mysql.clone())?;
     let mut payments = payments.into_iter()
         .map(|x| {

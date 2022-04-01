@@ -4,7 +4,9 @@ use crate::routes::AdminSession;
 use actix_multiresponse::Payload;
 use dal::{System, SYSTEM_USER_ID, User};
 use proto::OwesResponse;
+use tracing::instrument;
 
+#[instrument]
 pub async fn owes(data: WebData, _: AdminSession) -> WebResult<Payload<OwesResponse>> {
     let system = System::new(data.mysql.clone())?;
     let owning_users = system
