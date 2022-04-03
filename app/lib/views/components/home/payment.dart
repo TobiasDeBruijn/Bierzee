@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bierzee/entities/payment.dart';
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/main.dart';
@@ -209,12 +211,79 @@ class _PaymentDialogState extends State<_PaymentDialog> {
       isPaymentLoading = false;
     });
 
-    if(!success.handleNotOk(context)) {
+    if (!success.handleNotOk(context)) {
       return;
     }
 
     widget.balanceComponentKey.currentState!.getValues();
     widget.getValuesFunction();
     Navigator.pop(context);
+
+    showDialog(context: context, builder: (builder) => _PaymentSuccessDialog());
+  }
+}
+
+class _PaymentSuccessDialog extends StatefulWidget {
+  const _PaymentSuccessDialog({Key? key}) : super(key: key);
+
+  @override
+  State<_PaymentSuccessDialog> createState() => _PaymentSuccessDialogState();
+}
+
+class _PaymentSuccessDialogState extends State<_PaymentSuccessDialog> with SingleTickerProviderStateMixin {
+
+  late AnimationController controller;
+  late Animation<double> scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    controller = AnimationController(vsync: this, duration: Duration(milliseconds: 450));
+    scaleAnimation = CurvedAnimation(parent: controller, curve: Curves.elasticInOut);
+
+    controller.addListener(() {
+      setState(() {});
+    });
+
+    controller.forward();
+
+    Timer(const Duration(seconds: 3), () {
+      Navigator.pop(context);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: ScaleTransition(
+          scale: scaleAnimation,
+          child: Container(
+            child: Padding(
+              padding: const EdgeInsets.all(50.0),
+              child: Card(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        'Je hebt betaald!',
+                        style: GoogleFonts.oxygen(fontSize: 30),
+                      ),
+                    ),
+                    Image.asset(
+                    "assets/bas.gif",
+                    )
+                  ]
+                ),
+              )
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
