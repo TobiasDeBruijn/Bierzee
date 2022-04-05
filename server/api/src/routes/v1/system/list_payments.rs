@@ -46,7 +46,8 @@ pub async fn list_payments(data: WebData, _: AdminSession, query: web::Query<Que
         .collect::<Result<Vec<_>, Error>>()?;
 
     payments.sort_by(|a, b| a.paid_at.cmp(&b.paid_at));
-
+    payments.reverse();
+        
     if let Some(max) = query.max {
         if max < payments.len() {
             // split_off changes the original vec to be 0..max,
