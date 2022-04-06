@@ -1,0 +1,4 @@
+flutter_icons:
+  image_path: "assets/logo.png"
+  ios: true
+  remove_alpha_ios: true
