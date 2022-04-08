@@ -16,8 +16,6 @@ pub struct BeerStockEntry {
     pub purchased_by: String,
     pub purchased_at: i64,
 }
-
-
 impl BeerStock {
     pub fn purchase(pool: ASql, crates: u32, amount_paid: f64, user_id: &str) -> DalResult<()> {
         let mut conn = pool.get_conn()?;

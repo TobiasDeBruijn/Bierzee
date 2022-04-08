@@ -12,6 +12,7 @@ pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeRe
     let payments = user.get_payments()?;
     let payments = payments
         .into_iter()
+        .filter(|x| x.denied.ne(&PaymentDeniedStatus::None))
         .map(|x| {
             let denied_by = match x.denied {
                 PaymentDeniedStatus::Denied(user_id) => {

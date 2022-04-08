@@ -12,6 +12,9 @@ pub const SYSTEM_USER_ID: &str = "0";
 const SYSTEM_USER_NAME: &str = "System";
 const DEFAULT_BEER_PRICE: f64 = 0.60;
 
+pub const GOOGLE_PLAY_USER_ID: &str = "GooglePlay";
+pub const APPLE_USER_ID: &str = "AppleDeveloper";
+
 const OPTION_BEER_PRICE: &str = "beer_price";
 const OPTION_GLOBAL_PASSWORD: &str = "global_password";
 
@@ -71,14 +74,26 @@ impl System {
 
     pub fn get_total_beers_consumed(&self) -> DalResult<i64> {
         let mut conn = self.pool.get_conn()?;
-        let rows: Vec<usize> = conn.exec("SELECT 1 FROM beers", Params::Empty)?;
+        let rows: Vec<Row> = conn.exec("SELECT user_id FROM beers", Params::Empty)?;
+        let rows = rows.into_iter()
+            .filter(|x| {
+                let user_id: String = x.get("user_id").unwrap();
+                user_id.ne(SYSTEM_USER_ID) && user_id.ne(GOOGLE_PLAY_USER_ID) && user_id.ne(APPLE_USER_ID)
+            })
+            .collect::<Vec<_>>();
+
         Ok(rows.len() as i64)
     }
 
     pub fn get_total_amount_paid(&self) -> DalResult<f64> {
         let mut conn = self.pool.get_conn()?;
-        let rows: Vec<Row> = conn.exec("SELECT amount_paid FROM payments", Params::Empty)?;
-        let sum: f64 = rows.into_iter().map(|x| x.get::<f64, &str>("amount_paid").unwrap()).sum();
+        let rows: Vec<Row> = conn.exec("SELECT amount_paid,user_id FROM payments", Params::Empty)?;
+        let sum: f64 = rows.into_iter()
+            .filter(|x| {
+                let user_id: String = x.get("user_id").unwrap();
+                user_id.ne(SYSTEM_USER_ID) && user_id.ne(GOOGLE_PLAY_USER_ID) && user_id.ne(APPLE_USER_ID)
+            })
+            .map(|x| x.get::<f64, &str>("amount_paid").unwrap()).sum();
 
         Ok(sum)
     }
