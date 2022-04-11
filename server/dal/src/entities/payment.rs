@@ -54,9 +54,11 @@ impl Payment {
         Ok(Some(Self::from(row)))
     }
 
-    pub fn list(pool: ASql) -> DalResult<Vec<Self>> {
+    pub fn list(pool: ASql, organization_id: &str) -> DalResult<Vec<Self>> {
         let mut conn = pool.get_conn()?;
-        let rows: Vec<Row> = conn.exec("SELECT payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments", Params::Empty)?;
+        let rows: Vec<Row> = conn.exec("SELECT payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE organization_id = :organization_id", params! {
+            "organization_id" => organization_id,
+        })?;
         let payments = rows.into_iter()
             .map(Self::from)
             .collect::<Vec<_>>();

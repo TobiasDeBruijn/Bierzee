@@ -1,18 +1,9 @@
 mod _mysql;
-mod beer;
-mod payment;
-mod session;
-mod system;
-mod user;
-mod notification;
+mod entities;
+mod hashing;
 
+pub use entities::*;
 pub use _mysql::*;
-pub use beer::*;
-pub use payment::*;
-pub use session::*;
-pub use system::*;
-pub use user::*;
-pub use notification::*;
 
 use thiserror::Error;
 
@@ -26,4 +17,6 @@ pub enum Error {
     Refinery(#[from] refinery::Error),
     #[error("{0}")]
     ParseFloat(#[from] std::num::ParseFloatError),
+    #[error("{0}")]
+    Bcrypt(#[from] bcrypt::BcryptError),
 }

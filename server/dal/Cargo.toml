@@ -8,6 +8,9 @@ authors = ["Tobias de Bruijn <t.debruijn@array21.dev>"]
 thiserror = "1.0.30"
 time = "0.3.7"
 rand = "0.8.5"
+sha2 = "0.10.2"
+bcrypt = "0.12.1"
+base64 = "0.13.0"
 
 [dependencies.mysql]
 version = "=22.0.0"

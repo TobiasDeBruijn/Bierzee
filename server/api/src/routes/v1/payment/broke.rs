@@ -18,8 +18,9 @@ pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeRe
                 PaymentDeniedStatus::Denied(user_id) => {
                     let denied_by = User::get(data.mysql.clone(), &user_id)?.ok_or(Error::NotFound("Could not find user who denied payment"))?;
                     Some(proto::User {
-                        employee_id: denied_by.employee_number,
+                        id: denied_by.id,
                         name: denied_by.name,
+                        login_id: denied_by.login_id,
                     })
                 },
                 PaymentDeniedStatus::None => None,
@@ -32,8 +33,9 @@ pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeRe
                 amount_paid: x.amount_paid,
                 denied: denied_by.is_some(),
                 paid_by: Some(proto::User {
-                    employee_id: paid_by_user.employee_number,
+                    id: paid_by_user.id,
                     name: paid_by_user.name,
+                    login_id: paid_by_user.login_id,
                 }),
                 denied_by,
                 payment_id: x.payment_id,

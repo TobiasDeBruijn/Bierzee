@@ -1,4 +1,4 @@
-use crate::user::User;
+use crate::entities::user::User;
 use crate::{ASql, DalResult};
 use mysql::prelude::Queryable;
 use mysql::{params, Row};
@@ -50,7 +50,7 @@ impl UserSession {
             "INSERT INTO sessions (id, user_id, expires_at) VALUES (:id, :user_id, :expires_at)",
             params! {
                 "id" => &id,
-                "user_id" => &user.employee_number,
+                "user_id" => &user.id,
                 "expires_at" => expires_at
             },
         )?;
@@ -58,7 +58,7 @@ impl UserSession {
         Ok(Self {
             pool,
             id,
-            user: user.employee_number.clone(),
+            user: user.id.clone(),
             expires_at,
         })
     }

@@ -17,7 +17,8 @@ pub async fn stock(data: WebData, _: AdminSession) -> WebResult<Payload<GetBeerS
                 crates: x.crates,
                 purchased_by: Some(proto::User {
                     name: user.name,
-                    employee_id: user.employee_number
+                    id: user.id,
+                    login_id: user.login_id,
                 }),
                 purchased_at: x.purchased_at
             })

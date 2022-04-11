@@ -25,7 +25,8 @@ pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebR
         PaymentDeniedStatus::Denied(denied_by) => {
             let user = User::get(data.mysql.clone(), &denied_by)?.ok_or(Error::NotFound("User not found"))?;
             Some(proto::User {
-                employee_id: user.employee_number,
+                id: user.id,
+                login_id: user.login_id,
                 name: user.name
             })
         },
@@ -40,7 +41,8 @@ pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebR
         denied: denied_by.is_some(),
         paid_by: Some(proto::User {
             name: paid_by_user.name,
-            employee_id: paid_by_user.employee_number,
+            login_id: user.login_id,
+            id: paid_by_user.id,
         }),
         denied_by,
         payment_id: payment.payment_id,

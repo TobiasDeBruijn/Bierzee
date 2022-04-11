@@ -1,0 +1,13 @@
+syntax = "proto3";
+package bierzee;
+
+import "user.proto";
+
+message Payment {
+  string id = 1;
+  double amount = 2;
+  int64 paidAt = 3;
+  User user = 4;
+  bool denied = 5;
+  optional User deniedBy = 6;
+}

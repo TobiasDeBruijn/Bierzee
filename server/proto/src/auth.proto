@@ -1,0 +1,33 @@
+syntax = "proto3";
+package bierzee;
+
+import 'user.proto';
+import 'organization.proto';
+
+message Session {
+  string id = 1;
+  int64 expiresAt = 2;
+}
+
+message PostLoginRequest {
+  string userLoginId = 1;
+  string organizationCode = 2;
+  string organizationPassword = 3;
+}
+
+message PostLoginResponse {
+  User user = 1;
+  Organization organization = 2;
+  Session session = 3;
+}
+
+message PostSessionRequest {
+  string sessionId = 1;
+}
+
+message PostSessionResponse {
+  User user = 1;
+  Organization organization = 2;
+  Session session = 3;
+}
+

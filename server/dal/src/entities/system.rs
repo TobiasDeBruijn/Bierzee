@@ -1,4 +1,4 @@
-use crate::user::User;
+use crate::entities::user::User;
 use crate::{ASql, DalResult};
 use mysql::prelude::Queryable;
 use mysql::{params, Params, Row, Transaction, TxOpts};
@@ -152,7 +152,7 @@ impl System {
                 "name" => name,
                 "value" => value,
                 "last_updated" => time::OffsetDateTime::now_utc().unix_timestamp(),
-                "last_updated_by" => &user.employee_number
+                "last_updated_by" => &user.id
             },
         )?;
 

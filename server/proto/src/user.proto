@@ -1,0 +1,8 @@
+syntax = "proto3";
+package bierzee;
+
+message User {
+  string loginId = 1;
+  string name = 2;
+  string id = 3;
+}

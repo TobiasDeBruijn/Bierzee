@@ -15,9 +15,9 @@ pub async fn owes(data: WebData, _: AdminSession) -> WebResult<Payload<OwesRespo
         .map(|x| Ok((get_owed(&system, &x)?, x)))
         .collect::<WebResult<Vec<_>>>()?
         .into_iter()
-        .filter(|(_, user)| user.employee_number.ne(SYSTEM_USER_ID))
+        .filter(|(_, user)| user.id.ne(SYSTEM_USER_ID))
         .map(|(balance, user)| proto::OwningUser {
-            employee_id: user.employee_number,
+            employee_id: user.id,
             name: user.name,
             is_admin: user.is_admin,
             amount_owed: balance,

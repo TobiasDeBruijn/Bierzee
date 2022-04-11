@@ -10,7 +10,7 @@ use tracing::instrument;
 pub async fn session(data: WebData, session: Session) -> WebResult<Payload<GetSessionResponse>> {
     let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
     Ok(Payload(GetSessionResponse {
-        id: user.employee_number,
+        id: user.id,
         name: user.name,
         is_admin: user.is_admin
     }))

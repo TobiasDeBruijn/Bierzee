@@ -1,4 +1,4 @@
 mod items {
-    include!(concat!(env!("OUT_DIR"), "/bierzee.items.rs"));
+    include!(concat!(env!("OUT_DIR"), "/bierzee.rs"));
 }
 pub use items::*;

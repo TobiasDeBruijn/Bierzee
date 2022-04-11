@@ -1,15 +1,13 @@
 syntax = "proto3";
 
-package bierzee.items;
+package bierzee;
 
-message User {
-  string employee_id = 1;
-  string name = 2;
-}
+import 'user.proto';
 
 message LoginRequest {
-  string employeeId = 1;
-  string password = 2;
+  string loginId = 1;
+  string organizationPassword = 2;
+  string organizationCode = 3;
 }
 
 message LoginResponse {
@@ -89,12 +87,6 @@ message GetAboutResponse {
   string authors = 5;
   string repository = 6;
   string license = 7;
-}
-
-message AddUserRequest {
-  string employeeId = 1;
-  string name = 2;
-  bool isAdmin = 3;
 }
 
 message GetSessionResponse {

@@ -8,6 +8,7 @@ mod system;
 mod auth;
 mod about;
 mod notification;
+mod organization;
 
 pub struct V1Router;
 
@@ -21,6 +22,7 @@ impl Routable for V1Router {
                 .configure(payment::PaymentRouter::configure)
                 .configure(system::SystemRouter::configure)
                 .configure(notification::NotificationRouter::configure)
+                .configure(organization::OrganizationRouter::configure)
             );
     }
 }

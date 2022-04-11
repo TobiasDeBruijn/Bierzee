@@ -6,6 +6,7 @@ pub struct Config {
     pub mysql_database: String,
     pub mysql_username: String,
     pub mysql_password: String,
+    pub pepper: String,
 }
 
 impl Config {
