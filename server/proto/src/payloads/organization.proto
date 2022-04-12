@@ -1,0 +1,64 @@
+syntax = "proto3";
+package bierzee;
+
+import "entities/user.proto";
+import "entities/payment.proto";
+import "entities/beer.proto";
+import "entities/organization.proto";
+
+message GetOrganizationResponse {
+  Organization organization = 1;
+}
+
+message PostCreateOrganizationRequest {
+  string organizationName = 1;
+  string organizationPassword = 2;
+  string userName = 3;
+  string userLoginId = 4;
+}
+
+message PostCreateOrganizationResponse {
+  Organization organization = 1;
+  User user = 2;
+}
+
+message PostCreateUserRequest {
+  string userName = 1;
+  string userLoginId = 2;
+}
+
+message PostCreateUserResponse {
+  User user = 2;
+}
+
+message PostAdminRequest {
+  string userId = 1;
+  bool isAdmin = 2;
+}
+
+message GetListPaymentResponse {
+  repeated Payment payments = 1;
+}
+
+message PostDenyPaymentRequest {
+  string paymentId = 1;
+  bool denied = 2;
+}
+
+message GetListBeerResponse {
+  repeated Beer beers = 1;
+}
+
+message GetBeerStockResponse {
+  repeated BeerStockEntry beerStockEntries = 1;
+  int64 bottlesLeft = 2;
+}
+
+message PostPurchaseBeerStockRequest {
+  uint32 cratesPurchased = 1;
+  double amountPaid = 2;
+}
+
+message PostSetBeerPriceRequest {
+  double newPrice = 1;
+}

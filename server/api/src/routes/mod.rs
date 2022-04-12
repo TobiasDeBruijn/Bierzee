@@ -81,7 +81,7 @@ impl FromRequest for AdminSession {
             let session = session.await?;
             let data: &WebData = req.app_data().unwrap();
 
-            let authorized_user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
+            let authorized_user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::Unauthorized("Invalid session"))?;
             if !authorized_user.is_admin {
                 return Err(Error::Forbidden("Not an administrator"));
             }

@@ -1,0 +1,15 @@
+syntax = "proto3";
+package bierzee;
+
+import "entities/user.proto";
+
+message Beer {
+  User consumedBy = 1;
+  int64 consumedAt = 2;
+}
+
+message BeerStockEntry {
+  uint32 cratesAquired = 1;
+  User purchasedBy = 2;
+  int64 purchasedAt = 3;
+}

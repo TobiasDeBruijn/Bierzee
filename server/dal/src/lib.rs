@@ -19,4 +19,6 @@ pub enum Error {
     ParseFloat(#[from] std::num::ParseFloatError),
     #[error("{0}")]
     Bcrypt(#[from] bcrypt::BcryptError),
+    #[error("Not Found")]
+    NotFound
 }

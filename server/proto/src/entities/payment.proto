@@ -1,7 +1,7 @@
 syntax = "proto3";
 package bierzee;
 
-import "user.proto";
+import "entities/user.proto";
 
 message Payment {
   string id = 1;

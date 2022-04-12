@@ -8,7 +8,7 @@ use tracing::instrument;
 
 #[instrument]
 pub async fn balance(data: WebData, session: Session) -> WebResult<Payload<BalanceResponse>> {
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
+    let user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::Unauthorized("Invalid session"))?;
 
     let amount_paid: f64 = user.get_payments()?.into_iter()
         .filter(|x| match x.denied {

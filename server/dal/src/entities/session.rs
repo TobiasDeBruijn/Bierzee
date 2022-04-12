@@ -1,5 +1,5 @@
 use crate::entities::user::User;
-use crate::{ASql, DalResult};
+use crate::{ASql, DalResult, Error};
 use mysql::prelude::Queryable;
 use mysql::{params, Row};
 use rand::Rng;
@@ -11,8 +11,9 @@ const SESSION_EXPIRY_SECS: i64 = 2_592_000; // 30 days;
 pub struct UserSession {
     pool: ASql,
     pub id: String,
-    pub user: String,
+    pub user_id: String,
     pub expires_at: i64,
+    pub user: User,
 }
 
 impl UserSession {
@@ -28,15 +29,19 @@ impl UserSession {
             None => return Ok(None),
         };
 
+        let user_id: String = row.get("user_id").unwrap();
+        let user = User::get(pool.clone(), &user_id)?.ok_or(Error::NotFound)?;
+
         Ok(Some(UserSession {
             pool,
             id: id.to_string(),
-            user: row.get("user_id").unwrap(),
+            user_id,
             expires_at: row.get("expires_at").unwrap(),
+            user,
         }))
     }
 
-    pub fn create(pool: ASql, user: &User) -> DalResult<Self> {
+    pub fn create(pool: ASql, user: User) -> DalResult<Self> {
         let mut conn = pool.get_conn()?;
 
         let id: String = rand::thread_rng()
@@ -58,8 +63,9 @@ impl UserSession {
         Ok(Self {
             pool,
             id,
-            user: user.id.clone(),
+            user_id: user.id.clone(),
             expires_at,
+            user,
         })
     }
 

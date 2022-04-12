@@ -2,11 +2,13 @@ use actix_web::web::ServiceConfig;
 use crate::Routable;
 
 mod list;
-mod deny;
+mod stock;
+mod purchase;
+mod price;
 
-pub struct PaymentRouter;
+pub struct BeerRouter;
 
-impl Routable for PaymentRouter {
+impl Routable for BeerRouter {
     fn configure(config: &mut ServiceConfig) {
         todo!()
     }

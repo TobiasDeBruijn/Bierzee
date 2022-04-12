@@ -24,6 +24,7 @@ pub struct Payment {
     pub paid_at: i64,
     pub amount_paid: f64,
     pub denied: PaymentDeniedStatus,
+    pub organization_id: String,
 }
 
 impl From<mysql::Row> for Payment {
@@ -36,6 +37,7 @@ impl From<mysql::Row> for Payment {
             paid_by: row.get("user_id").unwrap(),
             paid_at: row.get("paid_at").unwrap(),
             amount_paid: row.get("amount_paid").unwrap(),
+            organization_id: row.get("organization_id").unwrap(),
             denied: PaymentDeniedStatus::new(denied, denied_by),
         }
     }
@@ -44,7 +46,7 @@ impl From<mysql::Row> for Payment {
 impl Payment {
     pub fn get_by_id(pool: ASql, payment_id: &str) -> DalResult<Option<Self>> {
         let mut conn = pool.get_conn()?;
-        let row: Row = match conn.exec_first("SELECT payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE payment_id = :payment_id", params! {
+        let row: Row = match conn.exec_first("SELECT organization_id,payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE payment_id = :payment_id", params! {
             "payment_id" => payment_id
         })? {
             Some(x) => x,
@@ -56,7 +58,7 @@ impl Payment {
 
     pub fn list(pool: ASql, organization_id: &str) -> DalResult<Vec<Self>> {
         let mut conn = pool.get_conn()?;
-        let rows: Vec<Row> = conn.exec("SELECT payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE organization_id = :organization_id", params! {
+        let rows: Vec<Row> = conn.exec("SELECT organization_id,payment_id,user_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE organization_id = :organization_id", params! {
             "organization_id" => organization_id,
         })?;
         let payments = rows.into_iter()

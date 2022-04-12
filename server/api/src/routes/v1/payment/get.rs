@@ -15,9 +15,9 @@ pub struct Path {
 #[instrument]
 pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebResult<Payload<proto::Payment>> {
     let payment = Payment::get_by_id(data.mysql.clone(), &path.payment_id)?.ok_or(Error::NotFound("Payment not found"))?;
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::NotFound("User not found"))?;
+    let user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::NotFound("User not found"))?;
 
-    if payment.paid_by.ne(&session.user) && !user.is_admin {
+    if payment.paid_by.ne(&session.user_id) && !user.is_admin {
         return Err(Error::Forbidden("Payment was not made by this user"));
     }
 

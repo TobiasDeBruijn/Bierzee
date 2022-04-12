@@ -8,7 +8,7 @@ use tracing::instrument;
 
 #[instrument]
 pub async fn drunk(data: WebData, session: Session) -> WebResult<Payload<DrunkResponse>> {
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
+    let user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::Unauthorized("Invalid session"))?;
     let beers = user.get_beers()?;
 
     let beers = beers.into_iter().map(|x| proto::Beer { drunk_at: x.consumed_at }).collect::<Vec<_>>();

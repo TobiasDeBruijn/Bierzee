@@ -6,6 +6,7 @@ use mysql::prelude::Queryable;
 use mysql::{params, Row};
 use rand::Rng;
 
+#[derive(Debug, Clone)]
 pub struct User {
     pool: ASql,
     pub id: String,
@@ -161,7 +162,7 @@ impl User {
     }
 
     pub fn create_session(&self) -> DalResult<UserSession> {
-        UserSession::create(self.pool.clone(), self)
+        UserSession::create(self.pool.clone(), self.clone())
     }
 
     pub fn set_admin(&self, admin: bool) -> DalResult<()> {

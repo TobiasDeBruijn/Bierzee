@@ -8,7 +8,7 @@ use tracing::instrument;
 
 #[instrument]
 pub async fn list(data: WebData, session: Session) -> WebResult<Payload<ListNotificationResponse>> {
-    let notifications = Notification::list(data.mysql.clone(), &session.user)?;
+    let notifications = Notification::list(data.mysql.clone(), &session.user_id)?;
     let notifications = notifications.into_iter()
         .filter(|x| !x.completed)
         .map(|x| proto::Notification {

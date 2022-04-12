@@ -1,13 +1,12 @@
 use actix_multiresponse::Payload;
-use dal::{Organization, User, UserBuildable, UserSession};
+use dal::{Organization, User, UserBuildable};
 use proto::{PostCreateUserRequest, PostCreateUserResponse};
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
-use crate::routes::Session;
+use crate::v1::organization::OrgAdmin;
 
-pub async fn create(data: WebData, payload: Payload<PostCreateUserRequest>, session: Session) -> WebResult<Payload<PostCreateUserResponse>> {
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::NotFound("User not found"))?;
-    let org = Organization::get(data.mysql.clone(), &user.organization_id)?.ok_or(Error::NotFound("Organization not found"))?;
+pub async fn create(data: WebData, payload: Payload<PostCreateUserRequest>, session: OrgAdmin) -> WebResult<Payload<PostCreateUserResponse>> {
+    let org = Organization::get(data.mysql.clone(), &session.user.organization_id)?.ok_or(Error::NotFound("Organization not found"))?;
 
     let user = User::create(data.mysql.clone(), UserBuildable {
         organization_id: org.id,

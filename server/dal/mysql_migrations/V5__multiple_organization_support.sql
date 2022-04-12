@@ -9,8 +9,14 @@ CREATE TABLE organizations (
     name VARCHAR(64) NOT NULL,
     hash VARCHAR(64) NOT NULL,
     code VARCHAR(6) NOT NULL,
-    created_at BIGINT NOT NULL,
-)
+    created_at BIGINT NOT NULL
+);
 
 ALTER TABLE payments
+ADD COLUMN organization_id VARCHAR(64) NOT NULL;
+
+ALTER TABLE beers
+ADD COLUMN organization_id VARCHAR(64) NOT NULL;
+
+ALTER TABLE beer_purchases
 ADD COLUMN organization_id VARCHAR(64) NOT NULL;

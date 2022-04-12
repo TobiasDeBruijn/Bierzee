@@ -8,7 +8,7 @@ use tracing::instrument;
 
 #[instrument]
 pub async fn broke(data: WebData, session: Session) -> WebResult<Payload<BrokeResponse>> {
-    let user = User::get(data.mysql.clone(), &session.user)?.ok_or(Error::Unauthorized("Invalid session"))?;
+    let user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::Unauthorized("Invalid session"))?;
     let payments = user.get_payments()?;
     let payments = payments
         .into_iter()
