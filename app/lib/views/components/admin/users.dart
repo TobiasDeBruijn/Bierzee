@@ -1,6 +1,8 @@
-import 'package:bierzee/entities/system.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/organization/user/create.dart';
+import 'package:bierzee/api/organization/user/list.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/organization.pb.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:bierzee/views/components/admin/beer_price.dart';
 import 'package:flutter/material.dart';
@@ -73,6 +75,10 @@ class _UserComponentState extends State<AdminUserComponent> {
           'Gebruikers',
           style: GoogleFonts.oxygen(fontWeight: FontWeight.bold),
         ),
+        Text(
+          'Organisatie ID: ' + widget.user.organizationCode,
+          style: GoogleFonts.oxygen(),
+        ),
         Table(
           children: users,
         ),
@@ -94,13 +100,12 @@ class _UserComponentState extends State<AdminUserComponent> {
 
   /// Get, and set, the values from the server
   void getValues() async {
-    Response<List<OwningUser>> response =
-        await OwningUser.getUsers(widget.user);
+    Response<GetListUserResponse> response = await OrgUserList.list(widget.user.sessionId);
     if (!response.handleNotOk(context)) {
       return;
     }
 
-    response.value!.sort((a, b) => a.name.compareTo(b.name));
+    response.value!.users.sort((a, b) => a.user.name.compareTo(b.user.name));
 
     setState(() {
       isLoading = false;
@@ -109,17 +114,17 @@ class _UserComponentState extends State<AdminUserComponent> {
         users.removeRange(1, users.length - 1);
       }
 
-      users.addAll(response.value!.map((e) => _buildTableRow(e)));
+      users.addAll(response.value!.users.map((e) => _buildTableRow(e)));
     });
   }
 
-  TableRow _buildTableRow(OwningUser user) {
+  TableRow _buildTableRow(UserWithBalance user) {
     return TableRow(
       children: [
         Padding(
           padding: const EdgeInsets.only(top: 8.0),
           child: Text(
-            user.name,
+            user.user.name,
             style: GoogleFonts.oxygen(),
           ),
         ),
@@ -189,7 +194,7 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
           TextFormField(
             controller: _employeeIdController,
             decoration: const InputDecoration(
-              labelText: 'Personeelsnummer',
+              labelText: 'Login ID',
             ),
             autovalidateMode: AutovalidateMode.always,
             validator: (value) =>
@@ -225,15 +230,12 @@ class _CreateUserDialogState extends State<_CreateUserDialog> {
       isSaving = true;
     });
 
-    Response<void> response = await System(user: widget.user).addUser(
-        employeeId: _employeeIdController.text,
-        name: _employeeNameController.text,
-        isAdmin: false);
+    Response<void> success = await OrgUserCreate.create(PostCreateUserRequest(userName: _employeeNameController.text, userLoginId: _employeeIdController.text), widget.user.sessionId);
     setState(() {
       isSaving = false;
     });
 
-    if (!response.handleNotOk(context)) {
+    if (!success.handleNotOk(context)) {
       return;
     }
 

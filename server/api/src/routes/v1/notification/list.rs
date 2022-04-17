@@ -1,25 +1,33 @@
 use actix_multiresponse::Payload;
-use dal::Notification;
-use proto::ListNotificationResponse;
+use dal::{Notification, User};
+use proto::GetListNotificationResponse;
 use crate::appdata::WebData;
-use crate::error::WebResult;
+use crate::error::{Error, WebResult};
 use crate::routes::Session;
 use tracing::instrument;
 
 #[instrument]
-pub async fn list(data: WebData, session: Session) -> WebResult<Payload<ListNotificationResponse>> {
+pub async fn list(data: WebData, session: Session) -> WebResult<Payload<GetListNotificationResponse>> {
     let notifications = Notification::list(data.mysql.clone(), &session.user_id)?;
     let notifications = notifications.into_iter()
         .filter(|x| !x.completed)
-        .map(|x| proto::Notification {
-            id: x.id,
-            created_at: x.created_at,
-            user_id: x.user_id,
-            text: x.text
+        .map(|x| {
+            let user = User::get(data.mysql.clone(), &x.user_id)?.ok_or(Error::NotFound("User not found"))?;
+            let notif = proto::Notification {
+                id: x.id,
+                created_at: x.created_at,
+                user: Some(proto::User {
+                    id: user.id,
+                    login_id: user.login_id,
+                    name: user.name,
+                }),
+                text: x.text
+            };
+            Ok(notif)
         })
-        .collect::<Vec<_>>();
+        .collect::<WebResult<Vec<_>>>()?;
 
-    Ok(Payload(ListNotificationResponse {
+    Ok(Payload(GetListNotificationResponse {
         notifications
     }))
 }

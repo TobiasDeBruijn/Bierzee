@@ -1,9 +1,11 @@
 import 'dart:async';
 
-import 'package:bierzee/entities/payment.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/payment/list.dart';
+import 'package:bierzee/api/payment/pay.dart';
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/main.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/payment.pb.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,7 @@ class _PaymentComponentState extends State<PaymentComponent> {
   }
 
   void getValues() async {
-    Response<List<PaymentEntity>> payments = await widget.user.getPayments();
+    Response<GetListPaymentsResponse> payments = await PaymentList.list(widget.user.sessionId);
     if(!payments.handleNotOk(context)) {
       return;
     }
@@ -43,10 +45,10 @@ class _PaymentComponentState extends State<PaymentComponent> {
     int startOfTodayEpoch = (DateTime.utc(dateTime.year, dateTime.month, dateTime.day).millisecondsSinceEpoch / 1000.0).floor();
 
     setState(() {
-      totalPaid = payments.value!.map((e) => e.amountPaid).sum;
-      paidToday = payments.value!
+      totalPaid = payments.value!.payments.map((e) => e.amount as double).sum;
+      paidToday = payments.value!.payments
           .where((element) => element.paidAt > startOfTodayEpoch)
-          .map((e) => e.amountPaid)
+          .map((e) => e.amount as double)
           .sum;
 
       isLoading = false;
@@ -205,7 +207,8 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     double value = double.parse(_inputController.text
         .replaceAll('€', "")
         .replaceAll(',', '.'));
-    Response<void> success = await widget.user.makePayment(value);
+
+    Response<void> success = await PaymentPay.pay(PostPayRequest(amount: value), widget.user.sessionId);
 
     setState(() {
       isPaymentLoading = false;
@@ -219,7 +222,9 @@ class _PaymentDialogState extends State<_PaymentDialog> {
     widget.getValuesFunction();
     Navigator.pop(context);
 
-    showDialog(context: context, builder: (builder) => _PaymentSuccessDialog());
+    if(widget.user.organizationId == ZANDZEE_ORG_ID) {
+      showDialog(context: context, builder: (builder) => _PaymentSuccessDialog());
+    }
   }
 }
 

@@ -3,7 +3,7 @@ use dal::User;
 use proto::PostAdminRequest;
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
-use crate::routes::{Empty, Session};
+use crate::routes::Empty;
 use crate::v1::organization::OrgAdmin;
 
 pub async fn admin(data: WebData, payload: Payload<PostAdminRequest>, session: OrgAdmin) -> WebResult<Empty> {

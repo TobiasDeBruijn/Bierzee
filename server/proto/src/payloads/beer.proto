@@ -1,0 +1,19 @@
+syntax = "proto3";
+package bierzee;
+
+import "entities/beer.proto";
+import 'entities/user.proto';
+
+message PostDrinkRequest {
+  int32 beersDrunk = 2;
+}
+
+message GetDrunkResponse {
+  repeated Beer beers = 1;
+}
+
+message GetBeerPriceResponse {
+  int64 lastUpdated = 1;
+  double price = 2;
+  User lastChangedBy = 3;
+}

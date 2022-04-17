@@ -1,5 +1,6 @@
+import 'package:bierzee/api/auth/logout.dart';
+import 'package:bierzee/api/common.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
 import 'package:bierzee/views/components/admin/beer_price.dart';
 import 'package:bierzee/views/components/admin/crates.dart';
 import 'package:bierzee/views/components/admin/recent_payments.dart';
@@ -77,7 +78,7 @@ class _HomeViewState extends State<HomeView> {
         IconButton(
           icon: Icon(Icons.logout),
           onPressed: () async {
-            Response<void> success = await widget.user.doLogout();
+            Response<void> success = await AuthLogout.logout(widget.user.sessionId);
             if(!success.handleNotOk(context)) {
               return;
             }

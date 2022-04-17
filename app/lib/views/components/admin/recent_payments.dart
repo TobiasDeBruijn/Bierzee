@@ -1,7 +1,10 @@
-import 'package:bierzee/entities/payment.dart';
-import 'package:bierzee/entities/system.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/organization/payment/deny.dart';
+import 'package:bierzee/api/organization/payment/list.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/entities/payment.pb.dart';
+import 'package:bierzee/proto/payloads/organization.pb.dart';
+import 'package:bierzee/proto/payloads/payment.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
@@ -92,26 +95,26 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
     ];
   }
   
-  DataRow _buildRow(PaymentEntity paymentEntity) {
+  DataRow _buildRow(Payment paymentEntity) {
     return DataRow(
       onLongPress: () => _openPaymentEntityDialog(paymentEntity),
       color: MaterialStateProperty.all(paymentEntity.denied ? Colors.red[200] : Colors.white),
       cells: [
         DataCell(
           Text(
-              paymentEntity.paidBy.name,
+              paymentEntity.user.name,
               style: GoogleFonts.oxygen()
           ),
         ),
         DataCell(
           Text(
-            paymentEntity.amountPaid.toStringAsFixed(2),
+            paymentEntity.amount.toStringAsFixed(2),
             style: GoogleFonts.oxygen(),
           ),
         ),
         DataCell(
           Text(
-            _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(paymentEntity.paidAt * 1000, isUtc: true).toLocal()),
+            _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(paymentEntity.paidAt.toInt() * 1000, isUtc: true).toLocal()),
             style: GoogleFonts.oxygen()
           ),
         ),
@@ -119,7 +122,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
     );
   }
   
-  void _openPaymentEntityDialog(PaymentEntity paymentEntity) {
+  void _openPaymentEntityDialog(Payment paymentEntity) {
     debugPrint('Opening dialog');
 
     showDialog(
@@ -133,7 +136,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
       _isLoading = true;
     });
 
-    Response<List<PaymentEntity>> paymentEntities = await System(user: widget.user).listPayments();
+    Response<GetListPaymentsResponse> paymentEntities = await OrgPaymentList.list(widget.user.sessionId);
     if(!paymentEntities.handleNotOk(context)) {
       setState(() {
         _isLoading = false;
@@ -142,7 +145,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
     }
 
     setState(() {
-      _recentPayments = paymentEntities.value!.map((e) => _buildRow(e)).toList();
+      _recentPayments = paymentEntities.value!.payments.map((e) => _buildRow(e)).toList();
       _isLoading = false;
     });
   }
@@ -150,7 +153,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
 
 class _RecentPaymentDialog extends StatefulWidget {
   final User user;
-  final PaymentEntity paymentEntity;
+  final Payment paymentEntity;
   final Function() getPaymentsFunction;
 
   const _RecentPaymentDialog({Key? key, required this.user, required this.paymentEntity, required this.getPaymentsFunction}) : super(key: key);
@@ -201,7 +204,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
               style: GoogleFonts.oxygen(),
             ),
             Text(
-              widget.paymentEntity.paidBy.name,
+              widget.paymentEntity.user.name,
               style: GoogleFonts.oxygen(),
             )
           ],
@@ -214,7 +217,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
               style: GoogleFonts.oxygen(),
             ),
             Text(
-              "€" + widget.paymentEntity.amountPaid.toStringAsFixed(2),
+              "€" + widget.paymentEntity.amount.toStringAsFixed(2),
               style: GoogleFonts.oxygen(),
             )
           ],
@@ -227,7 +230,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
               style: GoogleFonts.oxygen()
             ),
             Text(
-              _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.paymentEntity.paidAt * 1000, isUtc: true).toLocal()),
+              _dateFormat.format(DateTime.fromMillisecondsSinceEpoch(widget.paymentEntity.paidAt.toInt() * 1000, isUtc: true).toLocal()),
               style: GoogleFonts.oxygen()
             )
           ],
@@ -253,7 +256,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
               style: GoogleFonts.oxygen(),
             ),
             Text(
-              (widget.paymentEntity.denied ? widget.paymentEntity.deniedBy!.name : 'n.v.t.'),
+              (widget.paymentEntity.denied ? widget.paymentEntity.deniedBy.name : 'n.v.t.'),
               style: GoogleFonts.oxygen()
             )
           ],
@@ -295,7 +298,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
     setState(() {
       _isDenyingLoading = true;
     });
-    Response<void> success = await System(user: widget.user).denyPayment(widget.paymentEntity.paymentId, true);
+    Response<void> success = await OrgPaymentDeny.deny(PostDenyPaymentRequest(paymentId: widget.paymentEntity.id, denied: true), widget.user.sessionId);
     setState(() {
       _isDenyingLoading = false;
     });
@@ -311,7 +314,7 @@ class _RecentPaymentDialogState extends State<_RecentPaymentDialog> {
     setState(() {
       _isAllowingLoading = true;
     });
-    Response<void> success = await System(user: widget.user).denyPayment(widget.paymentEntity.paymentId, false);
+    Response<void> success = await OrgPaymentDeny.deny(PostDenyPaymentRequest(paymentId: widget.paymentEntity.id, denied: false), widget.user.sessionId);
     setState(() {
       _isAllowingLoading = false;
     });

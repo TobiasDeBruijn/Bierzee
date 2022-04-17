@@ -1,6 +1,7 @@
-import 'package:bierzee/entities/payment.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/payment/balance.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/payment.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -26,14 +27,14 @@ class BalanceComponentState extends State<BalanceComponent> {
   }
 
   void getValues() async {
-    Response<PaymentBalance> balance = await widget.user.getPaymentBalance();
+    Response<GetBalanceResponse> balance = await PaymentBalance.balance(widget.user.sessionId);
     if (!balance.handleNotOk(context)) {
       return;
     }
 
     setState(() {
       this.balance = balance.value!.balance;
-      this.beersLeft = balance.value!.beersLeft;
+      this.beersLeft = balance.value!.beersLeft.toInt();
       this.isLoading = false;
     });
   }

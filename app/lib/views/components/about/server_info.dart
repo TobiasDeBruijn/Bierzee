@@ -1,4 +1,6 @@
-import 'package:bierzee/entities/server_info.dart';
+import 'package:bierzee/api/about.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/proto/payloads/about.pb.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,17 +22,27 @@ class _ServerInfoState extends State<ServerInfoComponent> {
   @override
   void initState() {
     super.initState();
-    ServerInfoEntity.get().then((e) {
-      if(!e.handleNotOk(context)) {
-        return;
-      }
+    get();
+  }
 
-      setState(() {
-        _version = e.value!.version;
-        _repository = e.value!.repository;
-        _isLoading = false;
-      });
+  void get() async {
+    setState(() {
+      _isLoading = true;
+    });
 
+    Response<GetAboutResponse> response = await About.about();
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if(!response.handleNotOk(context)) {
+      return;
+    }
+
+    setState(() {
+      _version = response.value!.version;
+      _repository = response.value!.repository;
     });
   }
 

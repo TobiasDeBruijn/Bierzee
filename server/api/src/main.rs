@@ -55,7 +55,7 @@ fn config_governor() -> GovernorConfig<PeerIpKeyExtractor> {
 fn init_tracing() {
     let subscriber = tracing_subscriber::FmtSubscriber::builder()
         .compact()
-        .with_max_level(tracing::Level::DEBUG)
+        .with_max_level(tracing::Level::TRACE)
         .finish();
 
     tracing::subscriber::set_global_default(subscriber).expect("Setting default tracing subscriber");

@@ -1,5 +1,5 @@
 use mysql::prelude::Queryable;
-use mysql::{params, Params, Row};
+use mysql::{params, Row};
 use crate::{ASql, DalResult};
 
 #[derive(PartialEq)]

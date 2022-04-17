@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:bierzee/api/auth/session.dart';
+import 'package:bierzee/api/common.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/auth.pb.dart';
 import 'package:bierzee/views/home.dart';
 import 'package:bierzee/views/login.dart';
 import 'package:flutter/foundation.dart';
@@ -70,13 +72,21 @@ class _SplashScreenState extends State<SplashScreen> {
       return null;
     }
 
-    Response<User?> user = await User.getBySession(sessionId);
-    if(!user.handleNotOk(context)) {
+
+    Response<GetSessionResponse> response = await AuthSession.session(sessionId);
+    if(!response.handleNotOk(context)) {
       return null;
-    } else if (user.value == null) {
+    } else if (response.value == null) {
       return null;
     } else {
-      return user.value!;
+      return User(
+        organizationId: response.value!.organization.id,
+        sessionId: response.value!.session.id,
+        id: response.value!.user.id,
+        isAdmin: response.value!.isAdmin,
+        name: response.value!.user.name,
+        organizationCode: response.value!.organization.code,
+      );
     }
   }
 

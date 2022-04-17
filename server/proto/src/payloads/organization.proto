@@ -5,6 +5,7 @@ import "entities/user.proto";
 import "entities/payment.proto";
 import "entities/beer.proto";
 import "entities/organization.proto";
+import "entities/auth.proto";
 
 message GetOrganizationResponse {
   Organization organization = 1;
@@ -20,6 +21,7 @@ message PostCreateOrganizationRequest {
 message PostCreateOrganizationResponse {
   Organization organization = 1;
   User user = 2;
+  Session session = 3;
 }
 
 message PostCreateUserRequest {
@@ -34,10 +36,6 @@ message PostCreateUserResponse {
 message PostAdminRequest {
   string userId = 1;
   bool isAdmin = 2;
-}
-
-message GetListPaymentResponse {
-  repeated Payment payments = 1;
 }
 
 message PostDenyPaymentRequest {
@@ -61,4 +59,13 @@ message PostPurchaseBeerStockRequest {
 
 message PostSetBeerPriceRequest {
   double newPrice = 1;
+}
+
+message UserWithBalance {
+  User user = 1;
+  double balance = 2;
+}
+
+message GetListUserResponse {
+  repeated UserWithBalance users = 1;
 }

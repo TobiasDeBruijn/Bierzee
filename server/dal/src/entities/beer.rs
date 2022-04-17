@@ -1,11 +1,11 @@
-use mysql::{params, Params, Row};
+use mysql::{params, Row};
 use mysql::prelude::Queryable;
 use crate::{ASql, DalResult};
 
 pub const CRATE_SIZE: u32 = 24;
 
 pub struct Beer {
-    pub id: String,
+    pub id: u32,
     pub consumed_by: String,
     pub consumed_at: i64,
     pub organization_id: String,
@@ -43,7 +43,7 @@ impl BeerStock {
         let mut conn = pool.get_conn()?;
         let now = time::OffsetDateTime::now_utc().unix_timestamp();
 
-        conn.exec_drop("INSERT INTO beer_purchases (user_id, crates, amount_paid, date, organization_id) VALUES (:user_id, :crates, :amount_paid, :date, organization_id)", params! {
+        conn.exec_drop("INSERT INTO beer_purchases (user_id, crates, amount_paid, date, organization_id) VALUES (:user_id, :crates, :amount_paid, :date, :organization_id)", params! {
             "user_id" => user_id,
             "crates" => crates,
             "amount_paid" => amount_paid,

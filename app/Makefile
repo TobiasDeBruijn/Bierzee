@@ -3,13 +3,14 @@ all: dart-proto
 
 PROTOC=${HOME}/.local/bin/protoc
 PROTOC_GEN_DART=${HOME}/.pub-cache/bin/protoc-gen-dart
+PROTO_FILES := $(shell find ../server/proto/src/ -type f -name \*.proto) 
 
 # Compile protobuf files to Dart
 dart-proto: lib/components/proto/items.pb.dart
 lib/components/proto/items.pb.dart: protoc protoc-gen-dart
 	mkdir -p lib/proto
 	rm -rf lib/proto/*.dart
-	${PROTOC} -I=../server/proto/src/ --dart_out=lib/proto/ ../server/proto/src/items.proto --plugin=${PROTOC_GEN_DART}
+	${PROTOC} -I=../server/proto/src/ --dart_out=lib/proto/ ${PROTO_FILES} --plugin=${PROTOC_GEN_DART}
 
 # Install protoc
 protoc: ${HOME}/.local/bin/protoc

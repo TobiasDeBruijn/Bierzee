@@ -1,7 +1,9 @@
 
-import 'package:bierzee/entities/notification.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/notification/complete.dart';
+import 'package:bierzee/api/notification/list.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/notifications.pb.dart' as proto;
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -24,13 +26,13 @@ class _NotificationListComponentState extends State<NotificationListComponent> {
   }
 
   void _getNotifications() async {
-    Response<List<NotificationEntity>> notifications = await NotificationEntity.list(widget.user);
+    Response<proto.GetListNotificationResponse> notifications = await NotificationList.list(widget.user.sessionId);
     if(!notifications.handleNotOk(context)) {
       return;
     }
 
     setState(() {
-      notificationComponents = notifications.value!.map((e) => NotificationComponent(user: widget.user, notification: e, getNotificationsFunction: _getNotifications)).toList();
+      notificationComponents = notifications.value!.notifications.map((e) => NotificationComponent(user: widget.user, notification: e, getNotificationsFunction: _getNotifications)).toList();
     });
   }
   
@@ -43,7 +45,7 @@ class _NotificationListComponentState extends State<NotificationListComponent> {
 }
 
 class NotificationComponent extends StatefulWidget {
-  final NotificationEntity notification;
+  final proto.Notification notification;
   final Function() getNotificationsFunction;
   final User user;
 
@@ -97,7 +99,7 @@ class _NotificationComponentState extends State<NotificationComponent> {
       isOkLoading = true;
     });
 
-    Response<void> success = await widget.notification.markComplete(widget.user);
+    Response<void> success = await NotificationComplete.complete(proto.PostCompleteNotificationRequest(notificationId: widget.notification.id, completed: true), widget.user.sessionId);
     if(!success.handleNotOk(context)) {
       return;
     }

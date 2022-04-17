@@ -1,10 +1,10 @@
-
-
-import 'package:bierzee/entities/beer.dart';
-import 'package:bierzee/entities/system.dart';
+import 'package:bierzee/api/beer/price.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/organization/beer/price.dart';
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/main.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/beer.pb.dart';
+import 'package:bierzee/proto/payloads/organization.pb.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -37,15 +37,15 @@ class _BeerPriceState extends State<BeerPriceComponent> {
   }
 
   void getValues() async {
-    Response<BeerPrice> beerPrice = await widget.user.getBeerPrice();
+    Response<GetBeerPriceResponse> beerPrice = await BeerPrice.price(widget.user.sessionId);
     if(!beerPrice.handleNotOk(context)) {
       return;
     }
 
     setState(() {
       currentBeerPrice = beerPrice.value!.price;
-      lastChangedAt = beerPrice.value!.lastUpdated;
-      lastChangedBy = beerPrice.value!.lastChangedBy;
+      lastChangedAt = beerPrice.value!.lastUpdated.toInt();
+      lastChangedBy = beerPrice.value!.lastChangedBy.name;
       isLoading = false;
     });
   }
@@ -224,7 +224,7 @@ class _ChangeBeerPriceDialogState extends State<_ChangeBeerPriceDialog> {
     double value = double.parse(_inputController.text
         .replaceAll('€', '')
         .replaceAll(',', '.'));
-    Response<void> success = await System(user: widget.user).setBeerPrice(value);
+    Response<void> success = await OrgBeerPrice.price(PostSetBeerPriceRequest(newPrice: value), widget.user.sessionId);
 
     setState(() {
       isUpdating = false;

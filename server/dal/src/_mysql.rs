@@ -2,6 +2,7 @@ use crate::DalResult;
 use mysql::{OptsBuilder, Pool};
 use std::ops::Deref;
 use std::sync::Arc;
+use tracing::debug;
 
 mod migrations {
     use refinery::embed_migrations;
@@ -27,6 +28,7 @@ impl Mysql {
 
     pub fn migrate(&self) -> DalResult<()> {
         let mut conn = self.get_conn()?;
+        debug!("Running migrations");
         migrations::migrations::runner().run(&mut conn)?;
         Ok(())
     }

@@ -4,7 +4,6 @@ use crate::routes::routable::Routable;
 
 mod beer;
 mod payment;
-mod system;
 mod auth;
 mod about;
 mod notification;
@@ -20,7 +19,6 @@ impl Routable for V1Router {
                 .configure(auth::AuthRouter::configure)
                 .configure(beer::BeerRouter::configure)
                 .configure(payment::PaymentRouter::configure)
-                .configure(system::SystemRouter::configure)
                 .configure(notification::NotificationRouter::configure)
                 .configure(organization::OrganizationRouter::configure)
             );

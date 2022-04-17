@@ -1,7 +1,7 @@
 use std::future::Future;
 use std::ops::Deref;
 use std::pin::Pin;
-use actix_web::{FromRequest, HttpRequest};
+use actix_web::{FromRequest, HttpRequest, web};
 use actix_web::dev::Payload;
 use actix_web::web::ServiceConfig;
 use crate::error::Error;
@@ -19,7 +19,13 @@ pub struct OrganizationRouter;
 
 impl Routable for OrganizationRouter {
     fn configure(config: &mut ServiceConfig) {
-        todo!()
+        config.service(web::scope("/organization")
+            .route("/create", web::post().to(create::create))
+            .route("/{id}", web::get().to(get::get))
+            .configure(user::UserRouter::configure)
+            .configure(payment::PaymentRouter::configure)
+            .configure(beer::BeerRouter::configure)
+        );
     }
 }
 

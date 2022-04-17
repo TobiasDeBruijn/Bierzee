@@ -9,12 +9,12 @@ use tracing::instrument;
 
 #[derive(Debug, Deserialize)]
 pub struct Path {
-    payment_id: String
+    id: String
 }
 
 #[instrument]
 pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebResult<Payload<proto::Payment>> {
-    let payment = Payment::get_by_id(data.mysql.clone(), &path.payment_id)?.ok_or(Error::NotFound("Payment not found"))?;
+    let payment = Payment::get_by_id(data.mysql.clone(), &path.id)?.ok_or(Error::NotFound("Payment not found"))?;
     let user = User::get(data.mysql.clone(), &session.user_id)?.ok_or(Error::NotFound("User not found"))?;
 
     if payment.paid_by.ne(&session.user_id) && !user.is_admin {
@@ -37,14 +37,14 @@ pub async fn get(data: WebData, session: Session, path: web::Path<Path>) -> WebR
 
     Ok(Payload(proto::Payment {
         paid_at: payment.paid_at,
-        amount_paid: payment.amount_paid,
+        amount: payment.amount_paid,
         denied: denied_by.is_some(),
-        paid_by: Some(proto::User {
+        user: Some(proto::User {
             name: paid_by_user.name,
             login_id: user.login_id,
             id: paid_by_user.id,
         }),
         denied_by,
-        payment_id: payment.payment_id,
+        id: payment.payment_id,
     }))
 }

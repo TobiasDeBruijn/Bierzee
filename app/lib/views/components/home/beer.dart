@@ -1,6 +1,8 @@
-import 'package:bierzee/entities/beer.dart';
+import 'package:bierzee/api/beer/drink.dart';
+import 'package:bierzee/api/beer/drunk.dart';
+import 'package:bierzee/api/common.dart';
 import 'package:bierzee/entities/user.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/payloads/beer.pb.dart';
 import 'package:bierzee/views/components/home/balance.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,18 +35,18 @@ class _BeerComponentState extends State<BeerComponent> {
   }
 
   void getValues() async {
-    Response<List<Beer>> beers = await widget.user.getBeers();
+    Response<GetDrunkResponse> beers = await BeerDrunk.drunk(widget.user.sessionId);
 
     if(!beers.handleNotOk(context)) {
       return;
     }
 
-    beersConsumedTotal = beers.value!.length;
+    beersConsumedTotal = beers.value!.beers.length;
 
     DateTime dateTime = DateTime.now();
     int startOfTodayEpoch = (DateTime.utc(dateTime.year, dateTime.month, dateTime.day).millisecondsSinceEpoch / 1000.0).floor();
 
-    beersConsumedToday = beers.value!
+    beersConsumedToday = beers.value!.beers
         .where((element) => element.consumedAt > startOfTodayEpoch)
         .length;
 
@@ -137,14 +139,14 @@ class _BeerComponentState extends State<BeerComponent> {
       consumeBeerLoading = true;
     });
 
-    Response<void> success = await widget.user.consumeBeers(1);
-    if(!success.handleNotOk(context)) {
-      return;
-    }
-
+    Response<void> success = await BeerDrink.drink(PostDrinkRequest(beersDrunk: 1), widget.user.sessionId);
     setState(() {
       consumeBeerLoading = false;
     });
+
+    if(!success.handleNotOk(context)) {
+      return;
+    }
 
     getValues();
     widget.balanceComponentKey.currentState!.getValues();

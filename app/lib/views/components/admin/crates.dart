@@ -1,11 +1,13 @@
 
-import 'package:bierzee/entities/system.dart';
+import 'package:bierzee/api/common.dart';
+import 'package:bierzee/api/organization/beer/purchase.dart';
+import 'package:bierzee/api/organization/beer/stock.dart';
 import 'package:bierzee/entities/user.dart';
 import 'package:bierzee/main.dart';
-import 'package:bierzee/util/http.dart';
+import 'package:bierzee/proto/entities/beer.pb.dart';
+import 'package:bierzee/proto/payloads/organization.pb.dart';
 import 'package:bierzee/util/validation.dart';
 import 'package:flutter/material.dart';
-import 'package:bierzee/proto/items.pb.dart' as proto;
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -38,7 +40,7 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
       _isLoadingStock = true;
     });
 
-    Response<proto.GetBeerStockResponse> response = await System(user: widget.user).getBeerStock();
+    Response<GetBeerStockResponse> response = await OrgBeerStock.stock(widget.user.sessionId);
     setState(() {
       _isLoadingStock = false;
     });
@@ -48,9 +50,9 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
     }
 
     setState(() {
-      _crates = response.value!.stockEntries.map((e) => _buildStockRow(e)).toList();
+      _crates = response.value!.beerStockEntries.map((e) => _buildStockRow(e)).toList();
       _bottlesLeft = response.value!.bottlesLeft.toInt();
-      _paymentBalance = response.value!.paymentBalance;
+      _paymentBalance = -1.0; // TODO fetch this from somewhere
     });
   }
 
@@ -98,6 +100,7 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
             ),
           ],
         ),
+        /* TODO: We need to get this info first
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -111,6 +114,7 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
             )
           ],
         ),
+         */
         Divider(),
         Text(
           'Gehaalde voorraad',
@@ -158,7 +162,7 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
     ];
   }
 
-  DataRow _buildStockRow(proto.BeerStockEntry stockEntry) {
+  DataRow _buildStockRow(BeerStockEntry stockEntry) {
     final DateFormat dateFormat = DateFormat('dd/MM/yyyy HH:mm');
 
     return DataRow(
@@ -171,7 +175,7 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
         ),
         DataCell(
           Text(
-            stockEntry.crates.toString(),
+            stockEntry.cratesAquired.toString(),
             style: GoogleFonts.oxygen(),
           )
         ),
@@ -284,7 +288,7 @@ class _RegisterCratesPurchasedDialogState extends State<_RegisterCratesPurchased
         .replaceAll('€', '')
         .replaceAll(',', '.'));
 
-    Response<void> response = await System(user: widget.user).purchaseBeerStock(cratesPurchased, amountPaid);
+    Response<void> response = await OrgBeerPurchase.purchase(PostPurchaseBeerStockRequest(cratesPurchased: cratesPurchased, amountPaid: amountPaid), widget.user.sessionId);
     setState(() {
       _isLoading = false;
     });

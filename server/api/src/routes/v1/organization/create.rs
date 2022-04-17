@@ -16,6 +16,9 @@ pub async fn create(data: WebData, payload: Payload<PostCreateOrganizationReques
         login_id: payload.user_login_id.clone(),
     })?;
 
+    user.set_admin(true)?;
+    let session = user.create_session()?;
+
     Ok(Payload(PostCreateOrganizationResponse {
         organization: Some(proto::Organization {
             name: org.name,
@@ -27,6 +30,10 @@ pub async fn create(data: WebData, payload: Payload<PostCreateOrganizationReques
             id: user.id,
             login_id: user.login_id,
             name: user.name
+        }),
+        session: Some(proto::Session {
+            id: session.id,
+            expires_at: session.expires_at
         })
     }))
 }

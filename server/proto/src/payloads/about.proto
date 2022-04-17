@@ -1,0 +1,12 @@
+syntax = "proto3";
+package bierzee;
+
+message GetAboutResponse {
+  string version = 1;
+  int32 versionMajor = 2;
+  int32 versionMinor = 3;
+  int32 versionPatch = 4;
+  string authors = 5;
+  string repository = 6;
+  string license = 7;
+}

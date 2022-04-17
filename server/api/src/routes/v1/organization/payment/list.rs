@@ -3,7 +3,7 @@ use actix_web::web;
 use dal::{Organization, Payment, PaymentDeniedStatus, User};
 use crate::appdata::WebData;
 use crate::error::{Error, WebResult};
-use proto::GetListPaymentResponse;
+use proto::GetListPaymentsResponse;
 use serde::Deserialize;
 use crate::v1::organization::OrgAdmin;
 
@@ -15,7 +15,7 @@ pub struct Query {
     show_denied: Option<bool>,
 }
 
-pub async fn list(data: WebData, session: OrgAdmin, query: web::Query<Query>) -> WebResult<Payload<GetListPaymentResponse>> {
+pub async fn list(data: WebData, session: OrgAdmin, query: web::Query<Query>) -> WebResult<Payload<GetListPaymentsResponse>> {
     let org = Organization::get(data.mysql.clone(), &session.user.organization_id)?.ok_or(Error::NotFound("Organization not found"))?;
     let payments = Payment::list(data.mysql.clone(), &org.id)?;
 
@@ -67,7 +67,7 @@ pub async fn list(data: WebData, session: OrgAdmin, query: web::Query<Query>) ->
         payments.retain(|x| !x.denied);
     }
 
-    Ok(Payload(GetListPaymentResponse {
+    Ok(Payload(GetListPaymentsResponse {
         payments
     }))
 }

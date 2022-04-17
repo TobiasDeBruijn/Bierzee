@@ -23,7 +23,22 @@ pub struct UserBuildable {
 }
 
 impl User {
+    fn system_user(pool: ASql) -> Self {
+        Self {
+            pool,
+            organization_id: "SYSTEM".to_string(),
+            name: "SYSTEM".to_string(),
+            login_id: "SYSTEM".to_string(),
+            id: "SYSTEM".to_string(),
+            is_admin: false,
+        }
+    }
+
     pub fn get(pool: ASql, id: &str) -> DalResult<Option<Self>> {
+        if id.eq("SYSTEM") {
+            return Ok(Some(Self::system_user(pool)));
+        }
+
         let mut conn = pool.get_conn()?;
         let row: Row = match conn.exec_first(
             "SELECT login_id,organization_id,name,is_admin FROM users WHERE id = :id",
@@ -94,7 +109,7 @@ impl User {
     pub fn get_beers(&self) -> DalResult<Vec<Beer>> {
         let mut conn = self.pool.get_conn()?;
         let rows: Vec<Row> = conn.exec(
-            "SELECT consumed_at FROM beers WHERE user_id = :user_id",
+            "SELECT user_id,id,consumed_at,organization_id FROM beers WHERE user_id = :user_id",
             params! {
                 "user_id" => &self.id
             },
@@ -102,8 +117,10 @@ impl User {
         let beers = rows
             .into_iter()
             .map(|x| Beer {
-                consumer_by: self.id.clone(),
+                id: x.get("id").unwrap(),
+                organization_id: x.get("organization_id").unwrap(),
                 consumed_at: x.get("consumed_at").unwrap(),
+                consumed_by: x.get("user_id").unwrap(),
             })
             .collect::<Vec<_>>();
         Ok(beers)
@@ -112,10 +129,11 @@ impl User {
     pub fn drink_beer(&self, consumed_at: i64) -> DalResult<()> {
         let mut conn = self.pool.get_conn()?;
         conn.exec_drop(
-            "INSERT INTO beers (user_id, consumed_at) VALUES (:user_id, :consumed_at)",
+            "INSERT INTO beers (user_id, consumed_at, organization_id) VALUES (:user_id, :consumed_at, :organization_id)",
             params! {
                 "user_id" => &self.id,
-                "consumed_at" => consumed_at
+                "consumed_at" => consumed_at,
+                "organization_id" => &self.organization_id,
             },
         )?;
         Ok(())
@@ -124,7 +142,7 @@ impl User {
     pub fn get_payments(&self) -> DalResult<Vec<Payment>> {
         let mut conn = self.pool.get_conn()?;
         let rows: Vec<Row> = conn.exec(
-            "SELECT payment_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE user_id = :user_id",
+            "SELECT organization_id,payment_id,paid_at,amount_paid,denied,denied_by FROM payments WHERE user_id = :user_id",
             params! {
                 "user_id" => &self.id
             },
@@ -135,6 +153,7 @@ impl User {
                 let denied: bool = x.get("denied").unwrap();
                 let denied_by: Option<String> = x.get("denied_by").unwrap();
                 Payment {
+                    organization_id: x.get("organization_id").unwrap(),
                     payment_id: x.get("payment_id").unwrap(),
                     paid_by: self.id.clone(),
                     paid_at: x.get("paid_at").unwrap(),
@@ -150,12 +169,13 @@ impl User {
         let mut conn = self.pool.get_conn()?;
         let payment_id: String = rand::thread_rng().sample_iter(rand::distributions::Alphanumeric).take(32).map(char::from).collect();
         conn.exec_drop(
-            "INSERT INTO payments (payment_id, user_id, paid_at, amount_paid) VALUES (:payment_id, :user_id, :paid_at, :amount_paid)",
+            "INSERT INTO payments (payment_id, user_id, paid_at, amount_paid, organization_id) VALUES (:payment_id, :user_id, :paid_at, :amount_paid, :organization_id)",
             params! {
                 "payment_id" => &payment_id,
                 "user_id" => &self.id,
                 "paid_at" => paid_at,
-                "amount_paid" => amount
+                "amount_paid" => amount,
+                "organization_id" => &self.organization_id,
             },
         )?;
         Ok(())

@@ -1,3 +1,4 @@
+use actix_web::web;
 use actix_web::web::ServiceConfig;
 use crate::Routable;
 
@@ -8,6 +9,9 @@ pub struct PaymentRouter;
 
 impl Routable for PaymentRouter {
     fn configure(config: &mut ServiceConfig) {
-        todo!()
+        config.service(web::scope("/payment")
+            .route("/deny", web::post().to(deny::deny))
+            .route("/list", web::get().to(list::list))
+        );
     }
 }
