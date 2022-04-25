@@ -1,7 +1,7 @@
 # Bierzee
 Bierzee is a simple app written for some folk at work who drink beers but occasionally forget to pay. Progress can be tracked [here](https://trello.com/b/bywuxafZ/bierzee).
 
-Available on [Google Play](https://play.google.com/store/apps/details?id=dev.array21.bierzee)
+Available on [Google Play](https://play.google.com/store/apps/details?id=dev.array21.bierzee) and the [Apple AppStore](https://apps.apple.com/us/app/zandzee-bierzee/id1616386645?platform=iphone)
 
 ## Server
 The bierzee server is written in Rust. Compiling it thus requires the [Rust compiler](https://www.rust-lang.org/learn/get-started). A Dockerfile is available as well.
