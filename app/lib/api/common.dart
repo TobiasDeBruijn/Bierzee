@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-const String SERVER = "http://10.10.2.1:8080";
+//const String SERVER = "http://10.10.2.1:8080";
+const String SERVER = "https://bierzee-v2.k8s.array21.dev";
 
 Map<String, String> getProtobufHeaders() {
   return {
