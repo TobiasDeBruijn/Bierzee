@@ -12,12 +12,17 @@ class User {
 
   const User({required this.id, required this.name, required this.sessionId, required this.isAdmin, required this.organizationId, required this.organizationCode});
 
-  void setPreferences() async {
+  static Future<String?> getStoredSessionId() async {
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    return sharedPreferences.getString("sessionId");
+  }
+
+  void setStoredSessionId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.setString("sessionId", sessionId);
   }
 
-  void clearPreferences() async {
+  void clearStoredSessionId() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     sharedPreferences.remove("sessionId");
   }

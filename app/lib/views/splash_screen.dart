@@ -9,7 +9,6 @@ import 'package:bierzee/views/login.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:new_version/new_version.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -65,13 +64,11 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<User?> checkAndGetUser() async {
-    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
-    String? sessionId = sharedPreferences.getString("sessionId");
+    String? sessionId = await User.getStoredSessionId();
 
     if(sessionId == null) {
       return null;
     }
-
 
     Response<GetSessionResponse> response = await AuthSession.session(sessionId);
     if(!response.handleNotOk(context)) {
@@ -79,7 +76,7 @@ class _SplashScreenState extends State<SplashScreen> {
     } else if (response.value == null) {
       return null;
     } else {
-      return User(
+      User user = User(
         organizationId: response.value!.organization.id,
         sessionId: response.value!.session.id,
         id: response.value!.user.id,
@@ -87,6 +84,9 @@ class _SplashScreenState extends State<SplashScreen> {
         name: response.value!.user.name,
         organizationCode: response.value!.organization.code,
       );
+
+      user.setStoredSessionId();
+      return user;
     }
   }
 

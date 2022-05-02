@@ -83,6 +83,7 @@ class _HomeViewState extends State<HomeView> {
               return;
             }
 
+            widget.user.clearStoredSessionId();
             Navigator.pushReplacement(context, MaterialPageRoute(builder: (builder) => LoginView()));
           },
         )
