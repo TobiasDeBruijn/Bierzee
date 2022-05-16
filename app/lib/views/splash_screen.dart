@@ -65,6 +65,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<User?> checkAndGetUser() async {
     String? sessionId = await User.getStoredSessionId();
+    debugPrint("SessionID: ${sessionId}");
 
     if(sessionId == null) {
       return null;
@@ -72,10 +73,13 @@ class _SplashScreenState extends State<SplashScreen> {
 
     Response<GetSessionResponse> response = await AuthSession.session(sessionId);
     if(!response.handleNotOk(context)) {
+      debugPrint("Session response is not OK");
       return null;
     } else if (response.value == null) {
+      debugPrint("Session response value is null");
       return null;
     } else {
+      debugPrint("User is OK");
       User user = User(
         organizationId: response.value!.organization.id,
         sessionId: response.value!.session.id,

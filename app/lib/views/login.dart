@@ -122,15 +122,17 @@ class _LoginFormState extends State<LoginForm> {
                       return;
                     }
 
-
-                    navigateToHome(User(
+                    User user = User(
                       name: response.value!.user.name,
                       isAdmin: response.value!.isAdmin,
                       id: response.value!.user.id,
                       sessionId: response.value!.session.id,
                       organizationId: response.value!.organization.id,
                       organizationCode: response.value!.organization.code,
-                    ));
+                    );
+                    user.setStoredSessionId();
+
+                    navigateToHome(user);
                   },
                 ),
               ],

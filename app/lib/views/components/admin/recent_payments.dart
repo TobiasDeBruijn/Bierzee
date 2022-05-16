@@ -145,7 +145,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
     }
 
     setState(() {
-      _recentPayments = paymentEntities.value!.payments.map((e) => _buildRow(e)).toList();
+      _recentPayments = paymentEntities.value!.payments.map((e) => _buildRow(e)).toList().reversed.toList();
       _isLoading = false;
     });
   }
