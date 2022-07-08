@@ -79,4 +79,13 @@ impl UserSession {
         )?;
         Ok(())
     }
+
+    pub fn reset_expiry(&self) -> DalResult<()> {
+        let mut conn = self.pool.get_conn()?;
+        conn.exec_drop("UPDATE sessions SET expires_at = :expires_at WHERE id = :id", params! {
+            "id" => &self.id,
+            "expires_at" => time::OffsetDateTime::now_utc().unix_timestamp() + SESSION_EXPIRY_SECS
+        })?;
+        Ok(())
+    }
 }

@@ -53,6 +53,8 @@ impl FromRequest for Session {
                 return Err(Error::Unauthorized("Session has expired"));
             }
 
+            session.reset_expiry()?;
+
             Ok(Self(session))
         })
     }
