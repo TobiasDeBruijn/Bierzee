@@ -3,14 +3,14 @@
 //  source: payloads/payment.proto
 //
 // @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../entities/payment.pb.dart' as $1;
+import '../entities/payment.pb.dart' as $4;
 
 class PostPayRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PostPayRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
@@ -61,13 +61,13 @@ class PostPayRequest extends $pb.GeneratedMessage {
 
 class GetListPaymentsResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetListPaymentsResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
-    ..pc<$1.Payment>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'payments', $pb.PbFieldType.PM, subBuilder: $1.Payment.create)
+    ..pc<$4.Payment>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'payments', $pb.PbFieldType.PM, subBuilder: $4.Payment.create)
     ..hasRequiredFields = false
   ;
 
   GetListPaymentsResponse._() : super();
   factory GetListPaymentsResponse({
-    $core.Iterable<$1.Payment>? payments,
+    $core.Iterable<$4.Payment>? payments,
   }) {
     final _result = create();
     if (payments != null) {
@@ -97,7 +97,7 @@ class GetListPaymentsResponse extends $pb.GeneratedMessage {
   static GetListPaymentsResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$1.Payment> get payments => $_getList(0);
+  $core.List<$4.Payment> get payments => $_getList(0);
 }
 
 class GetBalanceResponse extends $pb.GeneratedMessage {

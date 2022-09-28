@@ -41,6 +41,11 @@ class _AdminCrateComponentState extends State<AdminCrateComponent> {
     });
 
     Response<GetBeerStockResponse> response = await OrgBeerStock.stock(widget.user.sessionId);
+
+    if(!mounted) {
+      return;
+    }
+
     setState(() {
       _isLoadingStock = false;
     });

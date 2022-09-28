@@ -3,15 +3,15 @@
 //  source: payloads/auth.proto
 //
 // @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
 import '../entities/user.pb.dart' as $0;
-import '../entities/organization.pb.dart' as $2;
-import '../entities/auth.pb.dart' as $3;
+import '../entities/organization.pb.dart' as $1;
+import '../entities/auth.pb.dart' as $2;
 
 class PostLoginRequest extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PostLoginRequest', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
@@ -91,8 +91,8 @@ class PostLoginRequest extends $pb.GeneratedMessage {
 class PostLoginResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PostLoginResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
     ..aOM<$0.User>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'user', subBuilder: $0.User.create)
-    ..aOM<$2.Organization>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $2.Organization.create)
-    ..aOM<$3.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $3.Session.create)
+    ..aOM<$1.Organization>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $1.Organization.create)
+    ..aOM<$2.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $2.Session.create)
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAdmin', protoName: 'isAdmin')
     ..hasRequiredFields = false
   ;
@@ -100,8 +100,8 @@ class PostLoginResponse extends $pb.GeneratedMessage {
   PostLoginResponse._() : super();
   factory PostLoginResponse({
     $0.User? user,
-    $2.Organization? organization,
-    $3.Session? session,
+    $1.Organization? organization,
+    $2.Session? session,
     $core.bool? isAdmin,
   }) {
     final _result = create();
@@ -152,26 +152,26 @@ class PostLoginResponse extends $pb.GeneratedMessage {
   $0.User ensureUser() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $2.Organization get organization => $_getN(1);
+  $1.Organization get organization => $_getN(1);
   @$pb.TagNumber(2)
-  set organization($2.Organization v) { setField(2, v); }
+  set organization($1.Organization v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasOrganization() => $_has(1);
   @$pb.TagNumber(2)
   void clearOrganization() => clearField(2);
   @$pb.TagNumber(2)
-  $2.Organization ensureOrganization() => $_ensure(1);
+  $1.Organization ensureOrganization() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  $3.Session get session => $_getN(2);
+  $2.Session get session => $_getN(2);
   @$pb.TagNumber(3)
-  set session($3.Session v) { setField(3, v); }
+  set session($2.Session v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasSession() => $_has(2);
   @$pb.TagNumber(3)
   void clearSession() => clearField(3);
   @$pb.TagNumber(3)
-  $3.Session ensureSession() => $_ensure(2);
+  $2.Session ensureSession() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.bool get isAdmin => $_getBF(3);
@@ -186,8 +186,8 @@ class PostLoginResponse extends $pb.GeneratedMessage {
 class GetSessionResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetSessionResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
     ..aOM<$0.User>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'user', subBuilder: $0.User.create)
-    ..aOM<$2.Organization>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $2.Organization.create)
-    ..aOM<$3.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $3.Session.create)
+    ..aOM<$1.Organization>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $1.Organization.create)
+    ..aOM<$2.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $2.Session.create)
     ..aOB(4, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'isAdmin', protoName: 'isAdmin')
     ..hasRequiredFields = false
   ;
@@ -195,8 +195,8 @@ class GetSessionResponse extends $pb.GeneratedMessage {
   GetSessionResponse._() : super();
   factory GetSessionResponse({
     $0.User? user,
-    $2.Organization? organization,
-    $3.Session? session,
+    $1.Organization? organization,
+    $2.Session? session,
     $core.bool? isAdmin,
   }) {
     final _result = create();
@@ -247,26 +247,26 @@ class GetSessionResponse extends $pb.GeneratedMessage {
   $0.User ensureUser() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $2.Organization get organization => $_getN(1);
+  $1.Organization get organization => $_getN(1);
   @$pb.TagNumber(2)
-  set organization($2.Organization v) { setField(2, v); }
+  set organization($1.Organization v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasOrganization() => $_has(1);
   @$pb.TagNumber(2)
   void clearOrganization() => clearField(2);
   @$pb.TagNumber(2)
-  $2.Organization ensureOrganization() => $_ensure(1);
+  $1.Organization ensureOrganization() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  $3.Session get session => $_getN(2);
+  $2.Session get session => $_getN(2);
   @$pb.TagNumber(3)
-  set session($3.Session v) { setField(3, v); }
+  set session($2.Session v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasSession() => $_has(2);
   @$pb.TagNumber(3)
   void clearSession() => clearField(3);
   @$pb.TagNumber(3)
-  $3.Session ensureSession() => $_ensure(2);
+  $2.Session ensureSession() => $_ensure(2);
 
   @$pb.TagNumber(4)
   $core.bool get isAdmin => $_getBF(3);

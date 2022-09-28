@@ -3,27 +3,27 @@
 //  source: payloads/organization.proto
 //
 // @dart = 2.12
-// ignore_for_file: annotate_overrides,camel_case_types,unnecessary_const,non_constant_identifier_names,library_prefixes,unused_import,unused_shown_name,return_of_invalid_type,unnecessary_this,prefer_final_fields
+// ignore_for_file: annotate_overrides,camel_case_types,constant_identifier_names,directives_ordering,library_prefixes,non_constant_identifier_names,prefer_final_fields,return_of_invalid_type,unnecessary_const,unnecessary_import,unnecessary_this,unused_import,unused_shown_name
 
 import 'dart:core' as $core;
 
 import 'package:fixnum/fixnum.dart' as $fixnum;
 import 'package:protobuf/protobuf.dart' as $pb;
 
-import '../entities/organization.pb.dart' as $2;
+import '../entities/organization.pb.dart' as $1;
 import '../entities/user.pb.dart' as $0;
-import '../entities/auth.pb.dart' as $3;
-import '../entities/beer.pb.dart' as $4;
+import '../entities/auth.pb.dart' as $2;
+import '../entities/beer.pb.dart' as $3;
 
 class GetOrganizationResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetOrganizationResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
-    ..aOM<$2.Organization>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $2.Organization.create)
+    ..aOM<$1.Organization>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $1.Organization.create)
     ..hasRequiredFields = false
   ;
 
   GetOrganizationResponse._() : super();
   factory GetOrganizationResponse({
-    $2.Organization? organization,
+    $1.Organization? organization,
   }) {
     final _result = create();
     if (organization != null) {
@@ -53,15 +53,15 @@ class GetOrganizationResponse extends $pb.GeneratedMessage {
   static GetOrganizationResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.Organization get organization => $_getN(0);
+  $1.Organization get organization => $_getN(0);
   @$pb.TagNumber(1)
-  set organization($2.Organization v) { setField(1, v); }
+  set organization($1.Organization v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasOrganization() => $_has(0);
   @$pb.TagNumber(1)
   void clearOrganization() => clearField(1);
   @$pb.TagNumber(1)
-  $2.Organization ensureOrganization() => $_ensure(0);
+  $1.Organization ensureOrganization() => $_ensure(0);
 }
 
 class PostCreateOrganizationRequest extends $pb.GeneratedMessage {
@@ -155,17 +155,17 @@ class PostCreateOrganizationRequest extends $pb.GeneratedMessage {
 
 class PostCreateOrganizationResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'PostCreateOrganizationResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
-    ..aOM<$2.Organization>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $2.Organization.create)
+    ..aOM<$1.Organization>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'organization', subBuilder: $1.Organization.create)
     ..aOM<$0.User>(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'user', subBuilder: $0.User.create)
-    ..aOM<$3.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $3.Session.create)
+    ..aOM<$2.Session>(3, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'session', subBuilder: $2.Session.create)
     ..hasRequiredFields = false
   ;
 
   PostCreateOrganizationResponse._() : super();
   factory PostCreateOrganizationResponse({
-    $2.Organization? organization,
+    $1.Organization? organization,
     $0.User? user,
-    $3.Session? session,
+    $2.Session? session,
   }) {
     final _result = create();
     if (organization != null) {
@@ -201,15 +201,15 @@ class PostCreateOrganizationResponse extends $pb.GeneratedMessage {
   static PostCreateOrganizationResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $2.Organization get organization => $_getN(0);
+  $1.Organization get organization => $_getN(0);
   @$pb.TagNumber(1)
-  set organization($2.Organization v) { setField(1, v); }
+  set organization($1.Organization v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasOrganization() => $_has(0);
   @$pb.TagNumber(1)
   void clearOrganization() => clearField(1);
   @$pb.TagNumber(1)
-  $2.Organization ensureOrganization() => $_ensure(0);
+  $1.Organization ensureOrganization() => $_ensure(0);
 
   @$pb.TagNumber(2)
   $0.User get user => $_getN(1);
@@ -223,15 +223,15 @@ class PostCreateOrganizationResponse extends $pb.GeneratedMessage {
   $0.User ensureUser() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  $3.Session get session => $_getN(2);
+  $2.Session get session => $_getN(2);
   @$pb.TagNumber(3)
-  set session($3.Session v) { setField(3, v); }
+  set session($2.Session v) { setField(3, v); }
   @$pb.TagNumber(3)
   $core.bool hasSession() => $_has(2);
   @$pb.TagNumber(3)
   void clearSession() => clearField(3);
   @$pb.TagNumber(3)
-  $3.Session ensureSession() => $_ensure(2);
+  $2.Session ensureSession() => $_ensure(2);
 }
 
 class PostCreateUserRequest extends $pb.GeneratedMessage {
@@ -468,13 +468,13 @@ class PostDenyPaymentRequest extends $pb.GeneratedMessage {
 
 class GetListBeerResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetListBeerResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
-    ..pc<$4.Beer>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'beers', $pb.PbFieldType.PM, subBuilder: $4.Beer.create)
+    ..pc<$3.Beer>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'beers', $pb.PbFieldType.PM, subBuilder: $3.Beer.create)
     ..hasRequiredFields = false
   ;
 
   GetListBeerResponse._() : super();
   factory GetListBeerResponse({
-    $core.Iterable<$4.Beer>? beers,
+    $core.Iterable<$3.Beer>? beers,
   }) {
     final _result = create();
     if (beers != null) {
@@ -504,19 +504,19 @@ class GetListBeerResponse extends $pb.GeneratedMessage {
   static GetListBeerResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$4.Beer> get beers => $_getList(0);
+  $core.List<$3.Beer> get beers => $_getList(0);
 }
 
 class GetBeerStockResponse extends $pb.GeneratedMessage {
   static final $pb.BuilderInfo _i = $pb.BuilderInfo(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'GetBeerStockResponse', package: const $pb.PackageName(const $core.bool.fromEnvironment('protobuf.omit_message_names') ? '' : 'bierzee'), createEmptyInstance: create)
-    ..pc<$4.BeerStockEntry>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'beerStockEntries', $pb.PbFieldType.PM, protoName: 'beerStockEntries', subBuilder: $4.BeerStockEntry.create)
+    ..pc<$3.BeerStockEntry>(1, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'beerStockEntries', $pb.PbFieldType.PM, protoName: 'beerStockEntries', subBuilder: $3.BeerStockEntry.create)
     ..aInt64(2, const $core.bool.fromEnvironment('protobuf.omit_field_names') ? '' : 'bottlesLeft', protoName: 'bottlesLeft')
     ..hasRequiredFields = false
   ;
 
   GetBeerStockResponse._() : super();
   factory GetBeerStockResponse({
-    $core.Iterable<$4.BeerStockEntry>? beerStockEntries,
+    $core.Iterable<$3.BeerStockEntry>? beerStockEntries,
     $fixnum.Int64? bottlesLeft,
   }) {
     final _result = create();
@@ -550,7 +550,7 @@ class GetBeerStockResponse extends $pb.GeneratedMessage {
   static GetBeerStockResponse? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.List<$4.BeerStockEntry> get beerStockEntries => $_getList(0);
+  $core.List<$3.BeerStockEntry> get beerStockEntries => $_getList(0);
 
   @$pb.TagNumber(2)
   $fixnum.Int64 get bottlesLeft => $_getI64(1);

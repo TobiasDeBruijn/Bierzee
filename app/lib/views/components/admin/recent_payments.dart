@@ -63,7 +63,7 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
         ),
         _recentPayments.isNotEmpty ? DataTable(
           columns: _getHeaderColumns(),
-          rows: _recentPayments
+          rows: _recentPayments,
         ) : Text(
           'Er zijn geen recente betalingen',
           style: GoogleFonts.oxygen(),
@@ -137,6 +137,11 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
     });
 
     Response<GetListPaymentsResponse> paymentEntities = await OrgPaymentList.list(widget.user.sessionId);
+
+    if(!mounted) {
+      return;
+    }
+
     if(!paymentEntities.handleNotOk(context)) {
       setState(() {
         _isLoading = false;
@@ -144,8 +149,12 @@ class _RecentPaymentsComponentState extends State<RecentPaymentsComponent> {
       return;
     }
 
+    List<DataRow> allPayments = paymentEntities.value!.payments.map((e) => _buildRow(e)).toList().reversed.toList();
+    int endIdx = allPayments.length > 10 ? 10 : allPayments.length;
+    List<DataRow> recentPayments = allPayments.getRange(0, endIdx).toList();
+
     setState(() {
-      _recentPayments = paymentEntities.value!.payments.map((e) => _buildRow(e)).toList().reversed.toList();
+      _recentPayments = recentPayments;
       _isLoading = false;
     });
   }
